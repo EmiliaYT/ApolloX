@@ -14,8 +14,8 @@ if($php -ne ""){
 	$binary = "php"
 }
 
-if(Test-Path "PocketMine-MP.phar"){
-	$file = "PocketMine-MP.phar"
+if(Test-Path "apollo.phar"){
+	$file = "apollo.phar"
 }elseif(Test-Path "src\pocketmine\PocketMine.php"){
 	$file = "src\pocketmine\PocketMine.php"
 }else{
