@@ -111,7 +111,7 @@ class Normal extends Generator{
 		return $this->selector->pickBiome($x + $xNoise - 1, $z + $zNoise - 1);
 	}
 	public function init(ChunkManager $level, Random $random) : void{
-		parent::init($level, $random);
+	//	parent::init($level, $random);
 		$this->level = $level;
 		$this->random = $random;
 		$this->random->setSeed($this->level->getSeed());
