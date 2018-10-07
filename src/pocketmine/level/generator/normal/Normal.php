@@ -69,8 +69,6 @@ class Normal extends Generator{
 			self::generateKernel();
 		}
 	}
-		$this->noiseBase = new Simplex($this->random, 4, 1 / 4, 1 / 32);
-		$this->random->setSeed($this->seed);
 	
 	private static function generateKernel() : void{
 		self::$GAUSSIAN_KERNEL = [];
