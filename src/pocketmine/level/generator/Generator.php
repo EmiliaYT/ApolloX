@@ -54,9 +54,9 @@ abstract class Generator{
 	}
 
 	/** @var ChunkManager */
-	protected $level;
+	public $level;
 	/** @var Random */
-	protected $random;
+	public $random;
 
 	abstract public function __construct(array $settings = []);
 
