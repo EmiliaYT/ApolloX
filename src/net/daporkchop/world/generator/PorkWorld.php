@@ -24,7 +24,7 @@ class PorkWorld extends Generator
 
     private $selector;
 
-    private $level;
+    public $level;
 
     private $populators = [];
 
@@ -34,7 +34,7 @@ class PorkWorld extends Generator
      * 
      * @var Random
      */
-    private $random;
+    public $random;
 
     private $noise1;
 
@@ -73,11 +73,11 @@ class PorkWorld extends Generator
     public function __construct(array $settings = [])
     {}
 
-	public function init(ChunkManager $level, Random $random) : void{
-		parent::init($level, $random);
+    public function init(ChunkManager $level, Random $random)
+    {
         $this->random = $random;
         $this->random->setSeed($level->getSeed());
-       // $this->level = $level;
+        $this->level = $level;
         $this->selector = new PorkBiomeSelector($this->random, Biome::getBiome(Biome::OCEAN));
         $this->generationPopulators[] = new GroundCover();
         $ores = new Ore();
