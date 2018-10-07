@@ -37,6 +37,8 @@ use pocketmine\level\generator\populator\Populator;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
+use net\daporkchop\world\PorkBiomeSelector;
+
 
 class Normal extends Generator{
 
@@ -108,6 +110,19 @@ class Normal extends Generator{
 		$this->noiseBase = new Simplex($this->random, 4, 1 / 4, 1 / 32);
 		$this->random->setSeed($this->level->getSeed());
 		$this->selector = new class($this->random) extends BiomeSelector{
+	    $this->selector = new PorkBiomeSelector($this->random, Biome::getBiome(Biome::OCEAN));
+ 		$this->selector->addBiome(Biome::getBiome(Biome::OCEAN));
+		$this->selector->addBiome(Biome::getBiome(Biome::PLAINS));
+		$this->selector->addBiome(Biome::getBiome(Biome::DESERT));
+		$this->selector->addBiome(Biome::getBiome(Biome::MOUNTAINS));
+		$this->selector->addBiome(Biome::getBiome(Biome::FOREST));
+		$this->selector->addBiome(Biome::getBiome(Biome::TAIGA));
+		$this->selector->addBiome(Biome::getBiome(Biome::SWAMP));
+		$this->selector->addBiome(Biome::getBiome(Biome::RIVER));
+		$this->selector->addBiome(Biome::getBiome(Biome::ICE_PLAINS));
+		$this->selector->addBiome(Biome::getBiome(Biome::SMALL_MOUNTAINS));
+		$this->selector->addBiome(Biome::getBiome(Biome::BIRCH_FOREST));
+			
 			protected function lookup(float $temperature, float $rainfall) : int{
 				if($rainfall < 0.25){
 					if($temperature < 0.7){
