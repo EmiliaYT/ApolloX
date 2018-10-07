@@ -15,7 +15,7 @@ class PorkBiomeSelector extends BiomeSelector   {
         $this->fallback = $fallback;
     }
     
-	public function recalculate() : void{
+    public function recalculate(){
         
     }
     
