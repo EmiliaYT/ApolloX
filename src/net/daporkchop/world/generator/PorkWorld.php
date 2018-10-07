@@ -117,7 +117,7 @@ class PorkWorld extends Generator
         return new Vector3(0.5, 128, 0.5);
     }
 
-    public function populateChunk(int $chunkX, int $chunkZ)
+    public function populateChunk(int $chunkX, int $chunkZ): void
     {
         $this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
         foreach ($this->populators as $populator) {
