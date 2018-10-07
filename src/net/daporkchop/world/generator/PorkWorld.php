@@ -24,7 +24,7 @@ class PorkWorld extends Generator
 
     private $selector;
 
-    private $level;
+    public $level;
 
     private $populators = [];
 
@@ -34,7 +34,7 @@ class PorkWorld extends Generator
      * 
      * @var Random
      */
-    private $random;
+    public $random;
 
     private $noise1;
 
