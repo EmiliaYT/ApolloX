@@ -147,31 +147,24 @@ class Normal extends Generator{
 			new OreType(BlockFactory::get(Block::GRAVEL), 10, 16, 0, 128)
 		]);
 		$this->populators[] = $ores;
+
 	}
-
+	
 	public function generateChunk(int $chunkX, int $chunkZ) : void{
-$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
-		
-		//$noise = Generator::getFastNoise3D($this->noiseBase, 16, 256, 16, 4, 8, 4, $chunkX * 16, 0, $chunkZ * 16);
-
+		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->seed);
+		$noise = $this->noiseBase->getFastNoise3D(16, 128, 16, 4, 8, 4, $chunkX * 16, 0, $chunkZ * 16);
 		$chunk = $this->level->getChunk($chunkX, $chunkZ);
-
 		$biomeCache = [];
-
 		for($x = 0; $x < 16; ++$x){
 			for($z = 0; $z < 16; ++$z){
 				$minSum = 0;
 				$maxSum = 0;
 				$weightSum = 0;
-
 				$biome = $this->pickBiome($chunkX * 16 + $x, $chunkZ * 16 + $z);
 				$chunk->setBiomeId($x, $z, $biome->getId());
-
 				for($sx = -self::$SMOOTH_SIZE; $sx <= self::$SMOOTH_SIZE; ++$sx){
 					for($sz = -self::$SMOOTH_SIZE; $sz <= self::$SMOOTH_SIZE; ++$sz){
-
 						$weight = self::$GAUSSIAN_KERNEL[$sx + self::$SMOOTH_SIZE][$sz + self::$SMOOTH_SIZE];
-
 						if($sx === 0 and $sz === 0){
 							$adjacent = $biome;
 						}else{
@@ -182,26 +175,20 @@ $this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->get
 								$biomeCache[$index] = $adjacent = $this->pickBiome($chunkX * 16 + $x + $sx, $chunkZ * 16 + $z + $sz);
 							}
 						}
-
 						$minSum += ($adjacent->getMinElevation() - 1) * $weight;
 						$maxSum += $adjacent->getMaxElevation() * $weight;
-
 						$weightSum += $weight;
 					}
 				}
-
 				$minSum /= $weightSum;
 				$maxSum /= $weightSum;
-
 				$smoothHeight = ($maxSum - $minSum) / 2;
-
-				for($y = 0; $y < 256; ++$y){
+				for($y = 0; $y < 128; ++$y){
 					if($y === 0){
 						$chunk->setBlockId($x, $y, $z, Block::BEDROCK);
 						continue;
 					}
 					$noiseValue = $noise[$x][$z][$y] - 1 / $smoothHeight * ($y - $smoothHeight - $minSum);
-
 					if($noiseValue > 0){
 						$chunk->setBlockId($x, $y, $z, Block::STONE);
 					}elseif($y <= $this->waterHeight){
@@ -210,23 +197,19 @@ $this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->get
 				}
 			}
 		}
-
 		foreach($this->generationPopulators as $populator){
 			$populator->populate($this->level, $chunkX, $chunkZ, $this->random);
 		}
 	}
-	
 	public function populateChunk(int $chunkX, int $chunkZ) : void{
-		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
+		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->seed);
 		foreach($this->populators as $populator){
 			$populator->populate($this->level, $chunkX, $chunkZ, $this->random);
 		}
-
 		$chunk = $this->level->getChunk($chunkX, $chunkZ);
 		$biome = Biome::getBiome($chunk->getBiomeId(7, 7));
 		$biome->populateChunk($this->level, $chunkX, $chunkZ, $this->random);
 	}
-
 	public function getSpawn() : Vector3{
 		return new Vector3(127.5, 128, 127.5);
 	}
