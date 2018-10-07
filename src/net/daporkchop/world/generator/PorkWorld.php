@@ -134,7 +134,7 @@ class PorkWorld extends Generator
         return [];
     }
 
-    public function generateChunk(int $x, int $z)
+    public function generateChunkint($chunkX, int $chunkZ): void
     {
         $chunk = $this->level->getChunk($x, $z);
         $this->random->setSeed(0xdeadbeef ^ ($x << 8) ^ $z ^ $this->level->getSeed());
