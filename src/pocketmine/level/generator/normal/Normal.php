@@ -45,9 +45,9 @@ class Normal extends Generator{
 	/** @var Populator[] */
 	private $populators = [];
 	/** @var ChunkManager */
-	private $level;
+	public $level;
 	/** @var Random */
-	private $random;
+	public $random;
 	/** @var int */
 	private $waterHeight = 62;
 	/** @var int */
