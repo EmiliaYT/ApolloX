@@ -153,7 +153,7 @@ class Normal extends Generator{
 	
 	public function generateChunk(int $chunkX, int $chunkZ) : void{
 		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
-		$noise = $this->noiseBase->getFastNoise3D(16, 128, 16, 4, 8, 4, $chunkX * 16, 0, $chunkZ * 16);
+		$noise = Generator::getFastNoise3D($this->noiseBase, 16, 256, 16, 4, 8, 4, $chunkX * 16, 0, $chunkZ * 16);
 		$chunk = $this->level->getChunk($chunkX, $chunkZ);
 		$biomeCache = [];
 		for($x = 0; $x < 16; ++$x){
