@@ -69,7 +69,9 @@ class Normal extends Generator{
 			self::generateKernel();
 		}
 	}
-
+		$this->noiseBase = new Simplex($this->random, 4, 1 / 4, 1 / 32);
+		$this->random->setSeed($this->seed);
+	
 	private static function generateKernel() : void{
 		self::$GAUSSIAN_KERNEL = [];
 
@@ -95,6 +97,7 @@ class Normal extends Generator{
 		return [];
 	}
 
+	
 	private function pickBiome(int $x, int $z) : Biome{
 		$hash = $x * 2345803 ^ $z * 9236449 ^ $this->level->getSeed();
 		$hash *= $hash + 223;
