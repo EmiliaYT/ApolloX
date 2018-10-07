@@ -9,7 +9,7 @@ use pocketmine\utils\Random;
 class PorkBiomeSelector extends BiomeSelector   {
     public $fallback;
     
-    public function __construct(Random $random, Biome $fallback)  {
+	public function __construct(Random $random, callable $lookup, Biome $fallback){
         parent::__construct($random, function($temp, $rain) {}, $fallback);
         
         $this->fallback = $fallback;
