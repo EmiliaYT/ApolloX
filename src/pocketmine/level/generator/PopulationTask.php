@@ -53,11 +53,9 @@ class PopulationTask extends AsyncTask{
 		foreach($level->getAdjacentChunks($chunk->getX(), $chunk->getZ()) as $i => $c){
 			$this->{"chunk$i"} = $c !== null ? $c->fastSerialize() : null;
 		}
-
-		$this->storeLocal($level);
 	}
 
-	public function onRun() : void{
+	public function onRun(){
 		/** @var SimpleChunkManager $manager */
 		$manager = $this->getFromThreadStore("generation.level{$this->levelId}.manager");
 		/** @var Generator $generator */
@@ -84,6 +82,11 @@ class PopulationTask extends AsyncTask{
 			}else{
 				$chunks[$i] = Chunk::fastDeserialize($ck);
 			}
+		}
+
+		if($chunk === null){
+			//TODO error
+			return;
 		}
 
 		$manager->setChunk($chunk->getX(), $chunk->getZ(), $chunk);
@@ -137,15 +140,20 @@ class PopulationTask extends AsyncTask{
 		}
 	}
 
-	public function onCompletion(Server $server) : void{
-		/** @var Level $level */
-		$level = $this->fetchLocal();
-		if(!$level->isClosed()){
-			if(!$this->state){
-				$level->registerGeneratorToWorker($this->worker->getAsyncWorkerId());
+	public function onCompletion(Server $server){
+		$level = $server->getLevel($this->levelId);
+		if($level !== null){
+			if($this->state === false){
+				$level->registerGenerator();
+				return;
 			}
 
 			$chunk = Chunk::fastDeserialize($this->chunk);
+
+			if($chunk === null){
+				//TODO error
+				return;
+			}
 
 			for($i = 0; $i < 9; ++$i){
 				if($i === 4){
@@ -154,11 +162,11 @@ class PopulationTask extends AsyncTask{
 				$c = $this->{"chunk$i"};
 				if($c !== null){
 					$c = Chunk::fastDeserialize($c);
-					$level->generateChunkCallback($c->getX(), $c->getZ(), $this->state ? $c : null);
+					$level->generateChunkCallback($c->getX(), $c->getZ(), $c);
 				}
 			}
 
-			$level->generateChunkCallback($chunk->getX(), $chunk->getZ(), $this->state ? $chunk : null);
+			$level->generateChunkCallback($chunk->getX(), $chunk->getZ(), $chunk);
 		}
 	}
 }

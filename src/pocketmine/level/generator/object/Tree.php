@@ -45,7 +45,7 @@ abstract class Tree{
 	public $leafBlock = Block::LEAVES;
 	public $treeHeight = 7;
 
-	public static function growTree(ChunkManager $level, int $x, int $y, int $z, Random $random, int $type = Sapling::OAK) : void{
+	public static function growTree(ChunkManager $level, int $x, int $y, int $z, Random $random, int $type = 0){
 		switch($type){
 			case Sapling::SPRUCE:
 				$tree = new SpruceTree();
@@ -60,9 +60,7 @@ abstract class Tree{
 			case Sapling::JUNGLE:
 				$tree = new JungleTree();
 				break;
-			case Sapling::ACACIA:
-			case Sapling::DARK_OAK:
-				return; //TODO
+			case Sapling::OAK:
 			default:
 				$tree = new OakTree();
 				/*if($random->nextRange(0, 9) === 0){
@@ -96,7 +94,8 @@ abstract class Tree{
 		return true;
 	}
 
-	public function placeObject(ChunkManager $level, int $x, int $y, int $z, Random $random) : void{
+	public function placeObject(ChunkManager $level, int $x, int $y, int $z, Random $random){
+
 		$this->placeTrunk($level, $x, $y, $z, $random, $this->treeHeight - 1);
 
 		for($yy = $y - 3 + $this->treeHeight; $yy <= $y + $this->treeHeight; ++$yy){
@@ -118,7 +117,7 @@ abstract class Tree{
 		}
 	}
 
-	protected function placeTrunk(ChunkManager $level, int $x, int $y, int $z, Random $random, int $trunkHeight) : void{
+	protected function placeTrunk(ChunkManager $level, int $x, int $y, int $z, Random $random, int $trunkHeight){
 		// The base dirt block
 		$level->setBlockIdAt($x, $y - 1, $z, Block::DIRT);
 

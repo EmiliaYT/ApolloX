@@ -37,24 +37,24 @@ class Tree extends Populator{
 
 	private $type;
 
-	public function __construct(int $type = Sapling::OAK){
+	public function __construct($type = Sapling::OAK){
 		$this->type = $type;
 	}
 
-	public function setRandomAmount(int $amount) : void{
+	public function setRandomAmount($amount){
 		$this->randomAmount = $amount;
 	}
 
-	public function setBaseAmount(int $amount) : void{
+	public function setBaseAmount($amount){
 		$this->baseAmount = $amount;
 	}
 
-	public function populate(ChunkManager $level, int $chunkX, int $chunkZ, Random $random) : void{
+	public function populate(ChunkManager $level, int $chunkX, int $chunkZ, Random $random){
 		$this->level = $level;
 		$amount = $random->nextRange(0, $this->randomAmount + 1) + $this->baseAmount;
 		for($i = 0; $i < $amount; ++$i){
-			$x = $random->nextRange($chunkX << 4, ($chunkX << 4) + 15);
-			$z = $random->nextRange($chunkZ << 4, ($chunkZ << 4) + 15);
+		    $x = $random->nextRange($chunkX << 4, $chunkX << 4 + 15);
+		    $z = $random->nextRange($chunkZ << 4, $chunkZ << 4 + 15);
 			$y = $this->getHighestWorkableBlock($x, $z);
 			if($y === -1){
 				continue;
@@ -63,12 +63,12 @@ class Tree extends Populator{
 		}
 	}
 
-	private function getHighestWorkableBlock(int $x, int $z) : int{
+	private function getHighestWorkableBlock($x, $z){
 		for($y = 127; $y > 0; --$y){
 			$b = $this->level->getBlockIdAt($x, $y, $z);
 			if($b === Block::DIRT or $b === Block::GRASS){
 				break;
-			}elseif($b !== Block::AIR and $b !== Block::SNOW_LAYER){
+			}elseif($b !== 0 and $b !== Block::SNOW_LAYER){
 				return -1;
 			}
 		}
