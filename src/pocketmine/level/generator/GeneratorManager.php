@@ -46,7 +46,7 @@ final class GeneratorManager{
 	//	self::addGenerator(End::class, "end");
 		//self::addGenerator(VoidGenerator::class, "void");
 
-		self::addGenerator(PorkWorld::class, "testing"); //not tested and maby not stable
+		self::addGenerator(PorkWorld::class, "porkworld"); //not tested and maby not stable
 	}
 
 	/**
