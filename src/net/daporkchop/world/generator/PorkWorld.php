@@ -74,7 +74,7 @@ class PorkWorld extends Generator
     {}
 
    	public function init(ChunkManager $level, Random $random) : void{
-		parent::init($level, $random);
+	//	parent::init($level, $random);
         $this->random = $random;
         $this->random->setSeed($level->getSeed());
         $this->level = $level;
