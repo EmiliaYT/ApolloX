@@ -24,7 +24,7 @@ class PorkWorld extends Generator
 
     private $selector;
 
-    private $level;
+    public $level;
 
     private $populators = [];
 
@@ -34,7 +34,7 @@ class PorkWorld extends Generator
      * 
      * @var Random
      */
-    private $random;
+    public $random;
 
     private $noise1;
 
@@ -73,8 +73,8 @@ class PorkWorld extends Generator
     public function __construct(array $settings = [])
     {}
 
-    public function init(ChunkManager $level, Random $random)
-    {
+   	public function init(ChunkManager $level, Random $random) : void{
+		parent::init($level, $random);
         $this->random = $random;
         $this->random->setSeed($level->getSeed());
         $this->level = $level;
@@ -118,7 +118,7 @@ class PorkWorld extends Generator
     }
 
     public function populateChunk(int $chunkX, int $chunkZ): void
-	{
+    {
         $this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
         foreach ($this->populators as $populator) {
             $populator->populate($this->level, $chunkX, $chunkZ, $this->random);
@@ -134,7 +134,7 @@ class PorkWorld extends Generator
         return [];
     }
 
-    public function generateChunk(int $chunkX, int $chunkZ): void
+    public function generateChunk (int $chunkX, int $chunkZ): void
     {
         $chunk = $this->level->getChunk($x, $z);
         $this->random->setSeed(0xdeadbeef ^ ($x << 8) ^ $z ^ $this->level->getSeed());
