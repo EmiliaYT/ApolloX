@@ -124,7 +124,7 @@ class PorkWorld extends Generator
             $populator->populate($this->level, $chunkX, $chunkZ, $this->random);
         }
         
-        $chunk = $this->level->getChunk($chunkX, $chunkZ);
+        $chunk = $this->level->getChunk($x, $z);
         $biome = Biome::getBiome($chunk->getBiomeId(7, 7));
         $biome->populateChunk($this->level, $chunkX, $chunkZ, $this->random);
     }
