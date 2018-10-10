@@ -137,7 +137,7 @@ class PorkWorld extends Generator
     public function generateChunk (int $chunkX, int $chunkZ): void
     {
         $chunk = $this->level->getChunk($chunkX, $chunkZ);
-        $this->random->setSeed(0xdeadbeef ^ ($x << 8) ^ $z ^ $this->level->getSeed());
+        $this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
         
         /*
          * $temp = array(
@@ -162,7 +162,7 @@ class PorkWorld extends Generator
         $k = $byte0 + 1;
         $b2 = 17;
         $l = $byte0 + 1;
-        $this->initNoiseField($x * $byte0, 0, $z * $byte0, $k, $b2, $l);
+        $this->initNoiseField($chunkX * $byte0, 0, $chunkZ * $byte0, $k, $b2, $l);
         
         for ($xPiece = 0; $xPiece < $byte0; $xPiece ++) {
             for ($zPiece = 0; $zPiece < $byte0; $zPiece ++) {
@@ -223,12 +223,12 @@ class PorkWorld extends Generator
         for ($xx = 0; $xx < 16; $xx ++) {
             for ($zz = 0; $zz < 16; $zz ++) {
                 $highest = $chunk->getHighestBlockAt($xx, $zz);
-                $chunk->setBiomeId($xx, $zz, $this->pickBiome($x * 16 + $xx, $z * 16 + $zz, $chunk->getBlockId($xx, $highest, $zz) == Block::WATER ? 1 : $highest)->biome->getId());
+                $chunk->setBiomeId($xx, $zz, $this->pickBiome($chunkX * 16 + $xx, $chunkZ * 16 + $zz, $chunk->getBlockId($xx, $highest, $zz) == Block::WATER ? 1 : $highest)->biome->getId());
             }
         }
         
         foreach ($this->generationPopulators as $populator) {
-            $populator->populate($this->level, $x, $z, $this->random);
+            $populator->populate($this->level, $chunkX, $chunkZ, $this->random);
         }
     }
 
@@ -324,7 +324,7 @@ class PorkWorld extends Generator
     public function pickBiome(int $x, int $z, $height)
     {
         // return Biome::getBiome(Biome::MOUNTAINS);
-        $hash = $x * 2345803 ^ $z * 9236449 ^ $this->level->getSeed();
+        $hash = $chunkX * 2345803 ^ $z * 9236449 ^ $this->level->getSeed();
         $hash *= $hash + 223;
         $xNoise = $hash >> 20 & 3;
         $zNoise = $hash >> 22 & 3;
