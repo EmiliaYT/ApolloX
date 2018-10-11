@@ -24,6 +24,9 @@ declare(strict_types=1);
 
 namespace pocketmine\block;
 
+use pocketmine\block\utils\Color;
+use pocketmine\block\utils\PillarRotationTrait;
+use pocketmine\block\utils\WoodType;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 
@@ -48,6 +51,9 @@ class BlockFactory{
 	public static $diffusesSkyLight = null;
 	/** @var \SplFixedArray<float> */
 	public static $blastResistance = null;
+	/** @var \SplFixedArray|\Closure[] */
+	private static $getInterceptors = null;
+
 
 	/** @var int[] */
 	public static $staticRuntimeIdMap = [];
