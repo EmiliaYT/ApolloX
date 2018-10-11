@@ -324,7 +324,7 @@ class PorkWorld extends Generator
     public function pickBiome(int $x, int $z, $height)
     {
         // return Biome::getBiome(Biome::MOUNTAINS);
-        $hash = $chunkX * 2345803 ^ $z * 9236449 ^ $this->level->getSeed();
+        $hash = $x * 2345803 ^ $z * 9236449 ^ $this->level->getSeed();
         $hash *= $hash + 223;
         $xNoise = $hash >> 20 & 3;
         $zNoise = $hash >> 22 & 3;
