@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\scheduler;
 
 use pocketmine\Collectable;
+use pocketmine\Server;
 
 /**
  * Class used to run async tasks in other threads.
@@ -63,7 +64,7 @@ abstract class AsyncTask extends Collectable{
 
 	private $crashed = false;
 
-	public function run() : void{
+	public function run(){
 		$this->result = null;
 
 		if(!$this->cancelRun){
@@ -89,7 +90,7 @@ abstract class AsyncTask extends Collectable{
 		return $this->serialized ? unserialize($this->result) : $this->result;
 	}
 
-	public function cancelRun() : void{
+	public function cancelRun(){
 		$this->cancelRun = true;
 	}
 
@@ -108,19 +109,19 @@ abstract class AsyncTask extends Collectable{
 	 * @param mixed $result
 	 * @param bool  $serialize
 	 */
-	public function setResult($result, bool $serialize = true) : void{
+	public function setResult($result, bool $serialize = true){
 		$this->result = $serialize ? serialize($result) : $result;
 		$this->serialized = $serialize;
 	}
 
-	public function setTaskId(int $taskId) : void{
+	public function setTaskId(int $taskId){
 		$this->taskId = $taskId;
 	}
 
 	/**
 	 * @return int|null
 	 */
-	public function getTaskId() : ?int{
+	public function getTaskId(){
 		return $this->taskId;
 	}
 
@@ -143,7 +144,7 @@ abstract class AsyncTask extends Collectable{
 	 * @param string $identifier
 	 * @param mixed  $value
 	 */
-	public function saveToThreadStore(string $identifier, $value) : void{
+	public function saveToThreadStore(string $identifier, $value){
 		if($this->worker === null or $this->isGarbage()){
 			throw new \BadMethodCallException("Objects can only be added to AsyncWorker thread-local storage during task execution");
 		}
@@ -164,14 +165,20 @@ abstract class AsyncTask extends Collectable{
 
 	/**
 	 * Actions to execute when run
+	 *
+	 * @return void
 	 */
-	abstract public function onRun() : void;
+	abstract public function onRun();
 
 	/**
 	 * Actions to execute when completed (on main thread)
 	 * Implement this if you want to handle the data in your AsyncTask after it has been processed
+	 *
+	 * @param Server $server
+	 *
+	 * @return void
 	 */
-	public function onCompletion() : void{
+	public function onCompletion(Server $server){
 
 	}
 
@@ -187,11 +194,13 @@ abstract class AsyncTask extends Collectable{
 
 	/**
 	 * @internal Only call from AsyncPool.php on the main thread
+	 *
+	 * @param Server $server
 	 */
-	public function checkProgressUpdates() : void{
+	public function checkProgressUpdates(Server $server){
 		while($this->progressUpdates->count() !== 0){
 			$progress = $this->progressUpdates->shift();
-			$this->onProgressUpdate(unserialize($progress));
+			$this->onProgressUpdate($server, unserialize($progress));
 		}
 	}
 
@@ -200,10 +209,11 @@ abstract class AsyncTask extends Collectable{
 	 * All {@link AsyncTask#publishProgress} calls should result in {@link AsyncTask#onProgressUpdate} calls before
 	 * {@link AsyncTask#onCompletion} is called.
 	 *
-	 * @param mixed $progress The parameter passed to {@link AsyncTask#publishProgress}. It is serialize()'ed
+	 * @param Server $server
+	 * @param mixed  $progress The parameter passed to {@link AsyncTask#publishProgress}. It is serialize()'ed
 	 *                         and then unserialize()'ed, as if it has been cloned.
 	 */
-	public function onProgressUpdate($progress) : void{
+	public function onProgressUpdate(Server $server, $progress){
 
 	}
 
@@ -228,8 +238,9 @@ abstract class AsyncTask extends Collectable{
 	 *
 	 * @param mixed $complexData the data to store
 	 *
+	 * @throws \BadMethodCallException if called from any thread except the main thread
 	 */
-	protected function storeLocal($complexData) : void{
+	protected function storeLocal($complexData){
 		if($this->worker !== null and $this->worker === \Thread::getCurrentThread()){
 			throw new \BadMethodCallException("Objects can only be stored from the parent thread");
 		}
