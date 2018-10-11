@@ -26,6 +26,7 @@ namespace pocketmine\level\generator\normal\biome;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\level\generator\populator\TallGrass;
+use pocketmine\level\generator\biome\Biome;
 
 class OceanBiome extends Biome{
 
