@@ -24,13 +24,14 @@ declare(strict_types=1);
 namespace pocketmine\level\generator\populator;
 
 use pocketmine\block\BlockFactory;
+use pocketmine\block\Liquid;
+use pocketmine\level\biome\Biome;
 use pocketmine\level\ChunkManager;
-use pocketmine\level\generator\biome\Biome;
 use pocketmine\utils\Random;
 
 class GroundCover extends Populator{
 
-	public function populate(ChunkManager $level, int $chunkX, int $chunkZ, Random $random){
+	public function populate(ChunkManager $level, int $chunkX, int $chunkZ, Random $random) : void{
 		$chunk = $level->getChunk($chunkX, $chunkZ);
 		for($x = 0; $x < 16; ++$x){
 			for($z = 0; $z < 16; ++$z){
@@ -43,17 +44,20 @@ class GroundCover extends Populator{
 					}
 
 					$column = $chunk->getBlockIdColumn($x, $z);
-					for($y = 255; $y > 0; --$y){
+					for($y = 127; $y > 0; --$y){
 						if($column{$y} !== "\x00" and !BlockFactory::get(ord($column{$y}))->isTransparent()){
 							break;
 						}
 					}
-					$startY = min(255, $y + $diffY);
+					$startY = min(127, $y + $diffY);
 					$endY = $startY - count($cover);
 					for($y = $startY; $y > $endY and $y >= 0; --$y){
 						$b = $cover[$startY - $y];
 						if($column{$y} === "\x00" and $b->isSolid()){
 							break;
+						}
+						if($b->canBeFlowedInto() and BlockFactory::get(ord($column{$y})) instanceof Liquid){
+							continue;
 						}
 						if($b->getDamage() === 0){
 							$chunk->setBlockId($x, $y, $z, $b->getId());
