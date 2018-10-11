@@ -33,7 +33,7 @@ class MakeServerCommand extends VanillaCommand{
     public function __construct(string $name){
         parent::__construct(
             $name,
-            "Creates a apollo Phar",
+            "Creates a Altay Phar",
             "/makeserver",
             ["ms"]
         );

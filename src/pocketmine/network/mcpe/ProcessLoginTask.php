@@ -199,7 +199,7 @@ class ProcessLoginTask extends AsyncTask{
 		$decodedSig = (new DerSignatureSerializer())->parse($sig);
 		$jwtSig = self::b64UrlEncode(
 			hex2bin(str_pad(gmp_strval($decodedSig->getR(), 16), 96, "0", STR_PAD_LEFT)) .
-			hex2bin(str_pad(gmp_strval($decodedSig->getS(), 16), 96, "0", STR_PAD_LEFT))
+			hex2bin(str_pad(gmp_strval($decodedSig->getS(), 16), 96, "0", STR_PAD_LEFT)) //onCompletion
 		);
 
 		return "$jwtBody.$jwtSig";
@@ -216,11 +216,11 @@ class ProcessLoginTask extends AsyncTask{
 		return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
 	}
 
-	public function onCompletion(Server $server) : void{
+	public function onCompletion(Server $server){
 		/** @var Player $player */
 		$player = $this->fetchLocal();
 		if(!$player->isConnected()){
-			$server->getLogger()->error("Player " . $player->getName() . " was disconnected before their login could be verified");
+			$this->worker->getLogger()->error("Player " . $player->getName() . " was disconnected before their login could be verified");
 		}elseif($player->setAuthenticationStatus($this->authenticated, $this->error)){
 			if(!$this->useEncryption){
 				$player->getNetworkSession()->onLoginSuccess();

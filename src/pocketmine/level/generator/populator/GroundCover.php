@@ -25,7 +25,7 @@ namespace pocketmine\level\generator\populator;
 
 use pocketmine\block\BlockFactory;
 use pocketmine\block\Liquid;
-use pocketmine\level\biome\Biome;
+use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\ChunkManager;
 use pocketmine\utils\Random;
 

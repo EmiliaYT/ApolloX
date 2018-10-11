@@ -26,6 +26,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\level\generator\object\Tree;
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\Random;
@@ -38,30 +39,25 @@ class Sapling extends Flowable{
 	public const ACACIA = 4;
 	public const DARK_OAK = 5;
 
-	protected $id = self::SAPLING;
+	/** @var bool */
+	protected $ready = false;
 
-	public function __construct(int $meta = 0){
-		$this->meta = $meta;
+	protected function writeStateToMeta() : int{
+		return ($this->ready ? 0x08 : 0);
 	}
 
-	public function getName() : string{
-		static $names = [
-			0 => "Oak Sapling",
-			1 => "Spruce Sapling",
-			2 => "Birch Sapling",
-			3 => "Jungle Sapling",
-			4 => "Acacia Sapling",
-			5 => "Dark Oak Sapling"
-		];
-		return $names[$this->getVariant()] ?? "Unknown";
+	public function readStateFromMeta(int $meta) : void{
+		$this->ready = ($meta & 0x08) !== 0;
+	}
+
+	public function getStateBitmask() : int{
+		return 0b1000;
 	}
 
 	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null) : bool{
-		$down = $this->getSide(Vector3::SIDE_DOWN);
+		$down = $this->getSide(Facing::DOWN);
 		if($down->getId() === self::GRASS or $down->getId() === self::DIRT or $down->getId() === self::FARMLAND){
-			$this->getLevel()->setBlock($blockReplace, $this, true, true);
-
-			return true;
+			return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 		}
 
 		return false;
@@ -79,9 +75,21 @@ class Sapling extends Flowable{
 
 		return false;
 	}
+	
+		public function getName() : string{
+		static $names = [
+			0 => "Oak Sapling",
+			1 => "Spruce Sapling",
+			2 => "Birch Sapling",
+			3 => "Jungle Sapling",
+			4 => "Acacia Sapling",
+			5 => "Dark Oak Sapling"
+		];
+		return $names[$this->getVariant()] ?? "Unknown";
+	}
 
 	public function onNearbyBlockChange() : void{
-		if($this->getSide(Vector3::SIDE_DOWN)->isTransparent()){
+		if($this->getSide(Facing::DOWN)->isTransparent()){
 			$this->getLevel()->useBreakOn($this);
 		}
 	}
@@ -92,17 +100,13 @@ class Sapling extends Flowable{
 
 	public function onRandomTick() : void{
 		if($this->level->getFullLightAt($this->x, $this->y, $this->z) >= 8 and mt_rand(1, 7) === 1){
-			if(($this->meta & 0x08) === 0x08){
+			if($this->ready){
 				Tree::growTree($this->getLevel(), $this->x, $this->y, $this->z, new Random(mt_rand()), $this->getVariant());
 			}else{
-				$this->meta |= 0x08;
-				$this->getLevel()->setBlock($this, $this, true);
+				$this->ready = true;
+				$this->getLevel()->setBlock($this, $this);
 			}
 		}
-	}
-
-	public function getVariantBitmask() : int{
-		return 0x07;
 	}
 
 	public function getFuelTime() : int{

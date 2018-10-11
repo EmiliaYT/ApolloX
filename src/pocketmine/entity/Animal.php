@@ -36,6 +36,10 @@ abstract class Animal extends Mob implements Ageable{
 		return $this->getGenericFlag(self::DATA_FLAG_BABY);
 	}
 
+	public function getTalkInterval() : int{
+		return 120;
+	}
+
 	public function isBreedingItem(Item $item) : bool{ // TODO: Apply this to all animals
 		return $item->getId() === Item::WHEAT;
 	}
@@ -56,7 +60,7 @@ abstract class Animal extends Mob implements Ageable{
 				return true;
 			}
 		}
-		return false;
+		return parent::onInteract($player, $item, $clickPos, $slot);
 	}
 
 	public function entityBaseTick(int $diff = 1) : bool{
@@ -77,5 +81,9 @@ abstract class Animal extends Mob implements Ageable{
 
 	public function eatItem(Item $item) : void{
 		$this->broadcastEntityEvent(EntityEventPacket::EATING_ITEM, $item->getId());
+	}
+
+	public function allowLeashing() : bool{
+		return !$this->isLeashed() and $this->aiEnabled;
 	}
 }

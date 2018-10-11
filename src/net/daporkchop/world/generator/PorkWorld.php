@@ -73,8 +73,8 @@ class PorkWorld extends Generator
     public function __construct(array $settings = [])
     {}
 
-    public function init(ChunkManager $level, Random $random)
-    {
+   	public function init(ChunkManager $level, Random $random) : void{
+	//	parent::init($level, $random);
         $this->random = $random;
         $this->random->setSeed($level->getSeed());
         $this->level = $level;
@@ -117,7 +117,7 @@ class PorkWorld extends Generator
         return new Vector3(0.5, 128, 0.5);
     }
 
-    public function populateChunk(int $chunkX, int $chunkZ)
+    public function populateChunk(int $chunkX, int $chunkZ): void//z
     {
         $this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
         foreach ($this->populators as $populator) {
@@ -126,7 +126,7 @@ class PorkWorld extends Generator
         
         $chunk = $this->level->getChunk($chunkX, $chunkZ);
         $biome = Biome::getBiome($chunk->getBiomeId(7, 7));
-        $biome->populateChunk($this->level, $chunkX, $chunkZ, $this->random);
+        $biome->populateChunk($this->level, $chunkX, $chunkZ, $this->random);//x
     }
 
     public function getSettings(): array
@@ -134,10 +134,10 @@ class PorkWorld extends Generator
         return [];
     }
 
-    public function generateChunk(int $x, int $z)
+    public function generateChunk (int $chunkX, int $chunkZ): void
     {
-        $chunk = $this->level->getChunk($x, $z);
-        $this->random->setSeed(0xdeadbeef ^ ($x << 8) ^ $z ^ $this->level->getSeed());
+        $chunk = $this->level->getChunk($chunkX, $chunkZ);
+        $this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
         
         /*
          * $temp = array(
@@ -162,7 +162,7 @@ class PorkWorld extends Generator
         $k = $byte0 + 1;
         $b2 = 17;
         $l = $byte0 + 1;
-        $this->initNoiseField($x * $byte0, 0, $z * $byte0, $k, $b2, $l);
+        $this->initNoiseField($chunkX * $byte0, 0, $chunkZ * $byte0, $k, $b2, $l);
         
         for ($xPiece = 0; $xPiece < $byte0; $xPiece ++) {
             for ($zPiece = 0; $zPiece < $byte0; $zPiece ++) {
@@ -223,12 +223,12 @@ class PorkWorld extends Generator
         for ($xx = 0; $xx < 16; $xx ++) {
             for ($zz = 0; $zz < 16; $zz ++) {
                 $highest = $chunk->getHighestBlockAt($xx, $zz);
-                $chunk->setBiomeId($xx, $zz, $this->pickBiome($x * 16 + $xx, $z * 16 + $zz, $chunk->getBlockId($xx, $highest, $zz) == Block::WATER ? 1 : $highest)->biome->getId());
+                $chunk->setBiomeId($xx, $zz, $this->pickBiome($chunkX * 16 + $xx, $chunkZ * 16 + $zz, $chunk->getBlockId($xx, $highest, $zz) == Block::WATER ? 1 : $highest)->biome->getId());
             }
         }
         
         foreach ($this->generationPopulators as $populator) {
-            $populator->populate($this->level, $x, $z, $this->random);
+            $populator->populate($this->level, $chunkX, $chunkZ, $this->random);
         }
     }
 
@@ -250,10 +250,10 @@ class PorkWorld extends Generator
         $l1 = 0;
         $i2 = 16 / $xSize;
         
-        for ($x = 0; $x < $xSize; $x ++) {
-            $k2 = $x * $i2 + $i2 / 2;
-            for ($z = 0; $z < $zSize; $z ++) {
-                $i3 = $z * $i2 + $i2 / 2;
+        for ($chunkX = 0; $chunkX < $xSize; $chunkX ++) {
+            $k2 = $chunkX * $i2 + $i2 / 2;
+            for ($chunkZ = 0; $chunkZ < $zSize; $chunkZ ++) {//z
+                $i3 = $chunkZ * $i2 + $i2 / 2;
                 $d2 = 1;
                 $d3 = 1;
                 // $d2 = $temp[$k2 * 16 + $i3];
@@ -262,7 +262,7 @@ class PorkWorld extends Generator
                 $d4 *= $d4;
                 $d4 *= $d4;
                 $d4 = 1.0 - $d4;
-                $d5 = ($this->noise6[$l1] + 256) / 512;
+                $d5 = ($this->noise6[$l1] + 256) / 512;//x
                 $d5 *= $d4;
                 if ($d5 > 1.0) {
                     $d5 = 1.0;
@@ -301,7 +301,7 @@ class PorkWorld extends Generator
                     }
                     $d10 = $this->noise1[$k1] / 512;
                     $d11 = $this->noise2[$k1] / 512;
-                    $d12 = ($this->noise3[$k1] / 10 + 1.0) / 2;
+                    $d12 = ($this->noise3[$k1] / 10 + 1.0) / 2;//z
                     if ($d12 < 0.0) {
                         $d8 = $d10;
                     } elseif ($d12 > 1.0) {
@@ -321,10 +321,10 @@ class PorkWorld extends Generator
         }
     }
 
-    public function pickBiome(int $x, int $z, $height)
+    public function pickBiome(int $chunkX, int $chunkZ, $height) //x
     {
         // return Biome::getBiome(Biome::MOUNTAINS);
-        $hash = $x * 2345803 ^ $z * 9236449 ^ $this->level->getSeed();
+        $hash = $chunkX * 2345803 ^ $chunkZ * 9236449 ^ $this->level->getSeed();
         $hash *= $hash + 223;
         $xNoise = $hash >> 20 & 3;
         $zNoise = $hash >> 22 & 3;
@@ -335,6 +335,6 @@ class PorkWorld extends Generator
             $zNoise = 1;
         }
         
-        return $this->selector->pickBiomeNew($x + $xNoise - 1, $z + $zNoise - 1, $height);
+        return $this->selector->pickBiomeNew($chunkX + $xNoise - 1, $chunkZ + $zNoise - 1, $height);
     }
 }

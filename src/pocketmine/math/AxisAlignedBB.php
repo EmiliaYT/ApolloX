@@ -39,15 +39,19 @@ class AxisAlignedBB{
 	public $maxZ;
 
 	public function __construct(float $minX, float $minY, float $minZ, float $maxX, float $maxY, float $maxZ){
-		$this->minX = $minX;
-		$this->minY = $minY;
-		$this->minZ = $minZ;
-		$this->maxX = $maxX;
-		$this->maxY = $maxY;
-		$this->maxZ = $maxZ;
+		$this->setBounds($minX, $minY, $minZ, $maxX, $maxY, $maxZ);
 	}
 
 	public function setBounds(float $minX, float $minY, float $minZ, float $maxX, float $maxY, float $maxZ){
+		if($minX > $maxX){
+			throw new \InvalidArgumentException("minX $minX is larger than maxX $maxX");
+		}
+		if($minY > $maxY){
+			throw new \InvalidArgumentException("minY $minY is larger than maxY $maxY");
+		}
+		if($minZ > $maxZ){
+			throw new \InvalidArgumentException("minZ $minZ is larger than maxZ $maxZ");
+		}
 		$this->minX = $minX;
 		$this->minY = $minY;
 		$this->minZ = $minZ;
@@ -56,6 +60,16 @@ class AxisAlignedBB{
 		$this->maxZ = $maxZ;
 
 		return $this;
+	}
+
+	/**
+	 * Sets the bounding box's bounds from another AxisAlignedBB, and returns itself
+	 *
+	 * @param AxisAlignedBB $bb
+	 * @return $this
+	 */
+	public function setBB(AxisAlignedBB $bb){
+		return $this->setBounds($bb->minX, $bb->minY, $bb->minZ, $bb->maxX, $bb->maxY, $bb->maxZ);
 	}
 
 	/**
@@ -99,20 +113,8 @@ class AxisAlignedBB{
 	}
 
 	/**
-	 * Returns a new AxisAlignedBB with bounds outset by the specified X, Y and Z.
+	 * Outsets the bounds of this AxisAlignedBB by the specified X, Y and Z.
 	 *
-	 * @param float $x
-	 * @param float $y
-	 * @param float $z
-	 *
-	 * @return AxisAlignedBB
-	 */
-	public function grow(float $x, float $y, float $z) : AxisAlignedBB{
-		return new AxisAlignedBB($this->minX - $x, $this->minY - $y, $this->minZ - $z, $this->maxX + $x, $this->maxY + $y, $this->maxZ + $z);
-	}
-
-	/**
-	 * Performs the same operation as grow() but operates on itself instead of returning a new object.
 	 * @param float $x
 	 * @param float $y
 	 * @param float $z
@@ -131,7 +133,20 @@ class AxisAlignedBB{
 	}
 
 	/**
-	 * Performs the same operation as getOffsetBoundingBox(), but operates on itself instead of returning a new object.
+	 * Returns an expanded clone of this AxisAlignedBB.
+	 *
+	 * @param float $x
+	 * @param float $y
+	 * @param float $z
+	 *
+	 * @return AxisAlignedBB
+	 */
+	public function expandedCopy(float $x, float $y, float $z) : AxisAlignedBB{
+		return (clone $this)->expand($x, $y, $z);
+	}
+
+	/**
+	 * Shifts this AxisAlignedBB by the given X, Y and Z.
 	 *
 	 * @param float $x
 	 * @param float $y
@@ -151,7 +166,7 @@ class AxisAlignedBB{
 	}
 
 	/**
-	 * Returns a new AxisAlignedBB with bounds inset by the specified X, Y and Z.
+	 * Returns an offset clone of this AxisAlignedBB.
 	 *
 	 * @param float $x
 	 * @param float $y
@@ -159,12 +174,12 @@ class AxisAlignedBB{
 	 *
 	 * @return AxisAlignedBB
 	 */
-	public function shrink(float $x, float $y, float $z) : AxisAlignedBB{
-		return new AxisAlignedBB($this->minX + $x, $this->minY + $y, $this->minZ + $z, $this->maxX - $x, $this->maxY - $y, $this->maxZ - $z);
+	public function offsetCopy(float $x, float $y, float $z) : AxisAlignedBB{
+		return (clone $this)->offset($x, $y, $z);
 	}
 
 	/**
-	 * Performs the same operation as shrink(), but operates on itself instead of returning a new object.
+	 * Insets the bounds of this AxisAlignedBB by the specified X, Y and Z.
 	 *
 	 * @param float $x
 	 * @param float $y
@@ -184,23 +199,7 @@ class AxisAlignedBB{
 	}
 
 	/**
-	 * Sets the bounding box's bounds from another AxisAlignedBB, and returns itself
-	 *
-	 * @param AxisAlignedBB $bb
-	 * @return $this
-	 */
-	public function setBB(AxisAlignedBB $bb){
-		$this->minX = $bb->minX;
-		$this->minY = $bb->minY;
-		$this->minZ = $bb->minZ;
-		$this->maxX = $bb->maxX;
-		$this->maxY = $bb->maxY;
-		$this->maxZ = $bb->maxZ;
-		return $this;
-	}
-
-	/**
-	 * Returns a new AxisAlignedBB shifted by the specified X, Y and Z
+	 * Returns a contracted clone of this AxisAlignedBB.
 	 *
 	 * @param float $x
 	 * @param float $y
@@ -208,8 +207,8 @@ class AxisAlignedBB{
 	 *
 	 * @return AxisAlignedBB
 	 */
-	public function getOffsetBoundingBox(float $x, float $y, float $z) : AxisAlignedBB{
-		return new AxisAlignedBB($this->minX + $x, $this->minY + $y, $this->minZ + $z, $this->maxX + $x, $this->maxY + $y, $this->maxZ + $z);
+	public function contractedCopy(float $x, float $y, float $z) : AxisAlignedBB{
+		return (clone $this)->contract($x, $y, $z);
 	}
 
 	public function calculateXOffset(AxisAlignedBB $bb, float $x) : float{
@@ -282,12 +281,14 @@ class AxisAlignedBB{
 	 * Returns whether any part of the specified AABB is inside (intersects with) this one.
 	 *
 	 * @param AxisAlignedBB $bb
+	 * @param float         $epsilon
+	 *
 	 * @return bool
 	 */
-	public function intersectsWith(AxisAlignedBB $bb) : bool{
-		if($bb->maxX > $this->minX and $bb->minX < $this->maxX){
-			if($bb->maxY > $this->minY and $bb->minY < $this->maxY){
-				return $bb->maxZ > $this->minZ and $bb->minZ < $this->maxZ;
+	public function intersectsWith(AxisAlignedBB $bb, float $epsilon = 0.00001) : bool{
+		if($bb->maxX - $this->minX > $epsilon and $this->maxX - $bb->minX > $epsilon){
+			if($bb->maxY - $this->minY > $epsilon and $this->maxY - $bb->minY > $epsilon){
+				return $bb->maxZ - $this->minZ > $epsilon and $this->maxZ - $bb->minZ > $epsilon;
 			}
 		}
 
@@ -408,17 +409,17 @@ class AxisAlignedBB{
 		$f = -1;
 
 		if($vector === $v1){
-			$f = Vector3::SIDE_WEST;
+			$f = Facing::WEST;
 		}elseif($vector === $v2){
-			$f = Vector3::SIDE_EAST;
+			$f = Facing::EAST;
 		}elseif($vector === $v3){
-			$f = Vector3::SIDE_DOWN;
+			$f = Facing::DOWN;
 		}elseif($vector === $v4){
-			$f = Vector3::SIDE_UP;
+			$f = Facing::UP;
 		}elseif($vector === $v5){
-			$f = Vector3::SIDE_NORTH;
+			$f = Facing::NORTH;
 		}elseif($vector === $v6){
-			$f = Vector3::SIDE_SOUTH;
+			$f = Facing::SOUTH;
 		}
 
 		return new RayTraceResult($this, $f, $vector);
