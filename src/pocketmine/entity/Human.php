@@ -73,8 +73,6 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	/** @var EnderChestInventory */
 	protected $enderChestInventory;
 
-	/** @var UUID */
-	protected $uuid;
 	protected $rawUUID;
 
 	public $width = 0.6;
@@ -113,13 +111,6 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	public static function isValidSkin(string $skin) : bool{
 		$len = strlen($skin);
 		return $len === 64 * 64 * 4 or $len === 64 * 32 * 4 or $len === 128 * 128 * 4;
-	}
-
-	/**
-	 * @return UUID|null
-	 */
-	public function getUniqueId() : ?UUID{
-		return $this->uuid;
 	}
 
 	/**
@@ -913,13 +904,18 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 
 	/**
 	 * @param Entity $entity
+	 *
+	 * @return bool
 	 */
-	public function onCollideWithEntity(Entity $entity) : void{
-		if(!($entity instanceof Player)){
-			parent::onCollideWithEntity($entity);
-		}
+	public function canCollideWith(Entity $entity) : bool{
+		return !($entity instanceof Human);
 	}
 
+	/**
+	 * @param int $seatNumber
+	 *
+	 * @return Vector3
+	 */
 	public function getRiderSeatPosition(int $seatNumber = 0) : Vector3{
 		return new Vector3(-0.4, -0.15, 0.04);
 	}

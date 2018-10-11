@@ -25,7 +25,7 @@ settings:
  async-workers: auto
  #Whether to allow running development builds. Dev builds might crash, break your plugins, corrupt your world and more.
  #It is recommended to avoid using development builds where possible.
- enable-dev-builds: true
+ enable-dev-builds: false
 
 memory:
  #Global soft memory limit in megabytes. Set to 0 to disable
@@ -156,31 +156,6 @@ chunk-generation:
 ticks-per:
  autosave: 6000
 
-auto-report:
- #Send crash reports for processing
- enabled: true
- send-code: true
- send-settings: true
- send-phpinfo: false
- use-https: true
- host: crash.pmmp.io
-
-anonymous-statistics:
- #Sends anonymous statistics for data aggregation, plugin usage tracking
- enabled: false #TODO: re-enable this when we have a new stats host
- host: stats.pocketmine.net
-
-auto-updater:
- enabled: true
- on-update:
-  warn-console: true
-  warn-ops: true
- #Can be development, alpha, beta or stable.
- preferred-channel: stable
- #If using a development version, it will suggest changing the channel
- suggest-channels: true
- host: update.pmmp.io
-
 timings:
  #Choose the host to use for viewing your timings results.
  host: timings.pmmp.io
@@ -206,4 +181,4 @@ plugins:
  #Setting this to true will cause the legacy structure to be used where plugin data is placed inside the --plugins dir.
  #False will place plugin data under plugin_data under --data.
  #This option exists for backwards compatibility with existing installations.
- legacy-data-dir: true
+ legacy-data-dir: false

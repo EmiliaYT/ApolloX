@@ -33,7 +33,7 @@ class MakeServerCommand extends VanillaCommand{
     public function __construct(string $name){
         parent::__construct(
             $name,
-            "Creates a apollo Phar",
+            "Creates a Altay Phar",
             "/makeserver",
             ["ms"]
         );
@@ -46,7 +46,7 @@ class MakeServerCommand extends VanillaCommand{
         }
 
         $server = $sender->getServer();
-        $pharPath = Server::getInstance()->getPluginPath() . "Apollo" . DIRECTORY_SEPARATOR . $server->getName() . "_v" . $server->getApiVersion() . ".phar";
+        $pharPath = Server::getInstance()->getPluginPath() . "Altay" . DIRECTORY_SEPARATOR . $server->getName() . "_v" . $server->getApiVersion() . ".phar";
         if (file_exists($pharPath)) {
             $sender->sendMessage("Phar file already exists, overwriting...");
             @unlink($pharPath);
