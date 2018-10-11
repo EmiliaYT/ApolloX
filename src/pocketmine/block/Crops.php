@@ -26,34 +26,17 @@ namespace pocketmine\block;
 
 use pocketmine\event\block\BlockGrowEvent;
 use pocketmine\item\Item;
-use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
 
 abstract class Crops extends Flowable{
-	/** @var int */
-	protected $age = 0;
-
-	public function __construct(){
-
-	}
-
-	protected function writeStateToMeta() : int{
-		return $this->age;
-	}
-
-	public function readStateFromMeta(int $meta) : void{
-		$this->age = $meta;
-	}
-
-	public function getStateBitmask() : int{
-		return 0b111;
-	}
 
 	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null) : bool{
-		if($blockReplace->getSide(Facing::DOWN)->getId() === Block::FARMLAND){
-			return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
+		if($blockReplace->getSide(Vector3::SIDE_DOWN)->getId() === Block::FARMLAND){
+			$this->getLevel()->setBlock($blockReplace, $this, true, true);
+
+			return true;
 		}
 
 		return false;
@@ -63,15 +46,15 @@ abstract class Crops extends Flowable{
 	public function onActivate(Item $item, Player $player = null) : bool{
 		if($item->getId() === Item::DYE and $item->getDamage() === 0x0F){ //Bonemeal
 			$block = clone $this;
-			$block->age += mt_rand(2, 5);
-			if($block->age > 7){
-				$block->age = 7;
+			$block->meta += mt_rand(2, 5);
+			if($block->meta > 7){
+				$block->meta = 7;
 			}
 
 			Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($this, $block));
 
 			if(!$ev->isCancelled()){
-				$this->getLevel()->setBlock($this, $ev->getNewState());
+				$this->getLevel()->setBlock($this, $ev->getNewState(), true, true);
 			}
 
 			$item->count--;
@@ -83,7 +66,7 @@ abstract class Crops extends Flowable{
 	}
 
 	public function onNearbyBlockChange() : void{
-		if($this->getSide(Facing::DOWN)->getId() !== Block::FARMLAND){
+		if($this->getSide(Vector3::SIDE_DOWN)->getId() !== Block::FARMLAND){
 			$this->getLevel()->useBreakOn($this);
 		}
 	}
@@ -93,13 +76,15 @@ abstract class Crops extends Flowable{
 	}
 
 	public function onRandomTick() : void{
-		if($this->age < 7 and mt_rand(0, 2) === 1){
-			$block = clone $this;
-			++$block->age;
-			Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($this, $block));
+		if(mt_rand(0, 2) === 1){
+			if($this->meta < 0x07){
+				$block = clone $this;
+				++$block->meta;
+				Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($this, $block));
 
-			if(!$ev->isCancelled()){
-				$this->getLevel()->setBlock($this, $ev->getNewState());
+				if(!$ev->isCancelled()){
+					$this->getLevel()->setBlock($this, $ev->getNewState(), true, true);
+				}
 			}
 		}
 	}

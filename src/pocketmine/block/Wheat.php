@@ -30,12 +30,16 @@ class Wheat extends Crops{
 
 	protected $id = self::WHEAT_BLOCK;
 
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
+	}
+
 	public function getName() : string{
 		return "Wheat Block";
 	}
 
 	public function getDropsForCompatibleTool(Item $item) : array{
-		if($this->age >= 7){
+		if($this->meta >= 0x07){
 			return [
 				ItemFactory::get(Item::WHEAT),
 				ItemFactory::get(Item::WHEAT_SEEDS, 0, mt_rand(0, 3))

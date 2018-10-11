@@ -25,7 +25,6 @@ declare(strict_types=1);
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
-use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\tile\Beacon as TileBeacon;
@@ -35,8 +34,8 @@ class Beacon extends Transparent{
 
 	protected $id = self::BEACON;
 
-	public function __construct(){
-
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
 	}
 
 	public function getName() : string{
@@ -66,7 +65,7 @@ class Beacon extends Transparent{
 
 	public function onActivate(Item $item, Player $player = null) : bool{
 		if($player instanceof Player){
-			$top = $this->getSide(Facing::UP);
+			$top = $this->getSide(Vector3::SIDE_UP);
 			if($top->isTransparent() !== true){
 				return true;
 			}
@@ -77,10 +76,6 @@ class Beacon extends Transparent{
 		return true;
 	}
 
-	/**
-	 * @param int   $levels
-	 * @param Block $block
-	 */
 	public function buildPyramidLevels(int $levels, Block $block) : void{
 		for($i = 1; $i < $levels + 1; $i++){
 			for($x = -$i; $x < $i + 1; $x++){
@@ -91,9 +86,6 @@ class Beacon extends Transparent{
 		}
 	}
 
-	/**
-	 * @return TileBeacon
-	 */
 	public function getTile() : TileBeacon{
 		$t = $this->getLevel()->getTileAt($this->x, $this->y, $this->z);
 		return $t instanceof TileBeacon ? $t : new TileBeacon($this->getLevel(), TileBeacon::createNBT($this));

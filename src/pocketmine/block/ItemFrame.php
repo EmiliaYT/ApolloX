@@ -25,7 +25,6 @@ declare(strict_types=1);
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
-use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\tile\Tile;
@@ -36,23 +35,8 @@ class ItemFrame extends Flowable{
 
 	protected $itemId = Item::ITEM_FRAME;
 
-	/** @var int */
-	protected $facing = Facing::NORTH;
-
-	public function __construct(){
-
-	}
-
-	protected function writeStateToMeta() : int{
-		return 5 - $this->facing;
-	}
-
-	public function readStateFromMeta(int $meta) : void{
-		$this->facing = 5 - $meta;
-	}
-
-	public function getStateBitmask() : int{
-		return 0b11;
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
 	}
 
 	public function getName() : string{
@@ -61,37 +45,54 @@ class ItemFrame extends Flowable{
 
 	public function onActivate(Item $item, Player $player = null) : bool{
 		$tile = $this->level->getTile($this);
-		if($tile instanceof TileItemFrame){
-			if($tile->hasItem()){
-				$tile->setItemRotation(($tile->getItemRotation() + 1) % 8);
-			}elseif(!$item->isNull()){
-				$tile->setItem($item->pop());
-			}
+		if(!($tile instanceof TileItemFrame)){
+			$tile = Tile::createTile(Tile::ITEM_FRAME, $this->getLevel(), TileItemFrame::createNBT($this));
+		}
+
+		if($tile->hasItem()){
+			$tile->setItemRotation(($tile->getItemRotation() + 1) % 8);
+		}elseif(!$item->isNull()){
+			$tile->setItem($item->pop());
 		}
 
 		return true;
 	}
 
 	public function onNearbyBlockChange() : void{
-		if(!$this->getSide(Facing::opposite($this->facing))->isSolid()){
+		$sides = [
+			0 => Vector3::SIDE_WEST,
+			1 => Vector3::SIDE_EAST,
+			2 => Vector3::SIDE_NORTH,
+			3 => Vector3::SIDE_SOUTH
+		];
+		if(!$this->getSide($sides[$this->meta])->isSolid()){
 			$this->level->useBreakOn($this);
 		}
 	}
 
 	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null) : bool{
-		if($face === Facing::DOWN or $face === Facing::UP or !$blockClicked->isSolid()){
+		if($face === Vector3::SIDE_DOWN or $face === Vector3::SIDE_UP or !$blockClicked->isSolid()){
 			return false;
 		}
 
-		$this->facing = $face;
+		$faces = [
+			Vector3::SIDE_NORTH => 3,
+			Vector3::SIDE_SOUTH => 2,
+			Vector3::SIDE_WEST => 1,
+			Vector3::SIDE_EAST => 0
+		];
 
-		if(parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player)){
-			Tile::createTile(Tile::ITEM_FRAME, $this->getLevel(), TileItemFrame::createNBT($this, $face, $item, $player));
-			return true;
-		}
+		$this->meta = $faces[$face];
+		$this->level->setBlock($blockReplace, $this, true, true);
 
-		return false;
+		Tile::createTile(Tile::ITEM_FRAME, $this->getLevel(), TileItemFrame::createNBT($this, $face, $item, $player));
 
+		return true;
+
+	}
+
+	public function getVariantBitmask() : int{
+		return 0;
 	}
 
 	public function getDropsForCompatibleTool(Item $item) : array{

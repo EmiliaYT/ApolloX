@@ -29,10 +29,6 @@ class NetherBrickFence extends Fence{
 
 	protected $id = self::NETHER_BRICK_FENCE;
 
-	public function __construct(){
-
-	}
-
 	public function getHardness() : float{
 		return 2;
 	}

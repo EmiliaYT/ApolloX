@@ -26,54 +26,25 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 
-class DoubleSlab extends Solid{
-	/** @var int */
-	protected $singleId;
+abstract class DoubleSlab extends Solid{
 
-	public function __construct(int $id, int $singleId, int $variant = 0){
-		parent::__construct($id, $variant);
-		$this->singleId = $singleId;
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
 	}
 
-	protected function getSingle() : Block{
-		return BlockFactory::get($this->singleId, $this->variant);
-	}
-
-	public function getHardness() : float{
-		return $this->getSingle()->getHardness();
-	}
-
-	public function getToolType() : int{
-		return $this->getSingle()->getToolType();
-	}
-
-	public function getToolHarvestLevel() : int{
-		return $this->getSingle()->getToolHarvestLevel();
-	}
-
-	public function getFlameEncouragement() : int{
-		return $this->getSingle()->getFlameEncouragement();
-	}
-
-	public function getFlammability() : int{
-		return $this->getSingle()->getFlammability();
-	}
+	abstract public function getSlabId() : int;
 
 	public function getName() : string{
-		return "Double " . $this->getSingle()->getName();
+		return "Double " . BlockFactory::get($this->getSlabId(), $this->getVariant())->getName();
 	}
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		return [
-			ItemFactory::get($this->singleId, $this->variant, 2)
+			ItemFactory::get($this->getSlabId(), $this->getVariant(), 2)
 		];
 	}
 
 	public function isAffectedBySilkTouch() : bool{
 		return false;
-	}
-
-	public function getPickedItem() : Item{
-		return ItemFactory::get($this->singleId, $this->getVariant());
 	}
 }

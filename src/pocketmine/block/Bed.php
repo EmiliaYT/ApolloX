@@ -29,8 +29,6 @@ use pocketmine\lang\TranslationContainer;
 use pocketmine\level\Explosion;
 use pocketmine\level\Level;
 use pocketmine\math\AxisAlignedBB;
-use pocketmine\math\Bearing;
-use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\tile\Bed as TileBed;
@@ -38,38 +36,15 @@ use pocketmine\tile\Tile;
 use pocketmine\utils\TextFormat;
 
 class Bed extends Transparent{
-	private const BITFLAG_OCCUPIED = 0x04;
-	private const BITFLAG_HEAD = 0x08;
+	public const BITFLAG_OCCUPIED = 0x04;
+	public const BITFLAG_HEAD = 0x08;
 
 	protected $id = self::BED_BLOCK;
 
 	protected $itemId = Item::BED;
 
-	/** @var int */
-	protected $facing = Facing::NORTH;
-	/** @var bool */
-	protected $occupied = false;
-	/** @var bool */
-	protected $head = false;
-
-	public function __construct(){
-
-	}
-
-	protected function writeStateToMeta() : int{
-		return Bearing::fromFacing($this->facing) |
-			($this->occupied ? self::BITFLAG_OCCUPIED : 0) |
-			($this->head ? self::BITFLAG_HEAD : 0);
-	}
-
-	public function readStateFromMeta(int $meta) : void{
-		$this->facing = Bearing::toFacing($meta & 0x03);
-		$this->occupied = ($meta & self::BITFLAG_OCCUPIED) !== 0;
-		$this->head = ($meta & self::BITFLAG_HEAD) !== 0;
-	}
-
-	public function getStateBitmask() : int{
-		return 0b1111;
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
 	}
 
 	public function getHardness() : float{
@@ -85,39 +60,68 @@ class Bed extends Transparent{
 	}
 
 	public function isHeadPart() : bool{
-		return $this->head;
+		return ($this->meta & self::BITFLAG_HEAD) !== 0;
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function isOccupied() : bool{
-		return $this->occupied;
+		return ($this->meta & self::BITFLAG_OCCUPIED) !== 0;
 	}
 
 	public function setOccupied(bool $occupied = true){
-		$this->occupied = $occupied;
-		$this->level->setBlock($this, $this, false);
+		if($occupied){
+			$this->meta |= self::BITFLAG_OCCUPIED;
+		}else{
+			$this->meta &= ~self::BITFLAG_OCCUPIED;
+		}
 
-		if(($other = $this->getOtherHalf()) !== null){
-			$other->occupied = $occupied;
-			$this->level->setBlock($other, $other, false);
+		$this->getLevel()->setBlock($this, $this, false, false);
+
+		if(($other = $this->getOtherHalf()) !== null and $other->isOccupied() !== $occupied){
+			$other->setOccupied($occupied);
 		}
 	}
 
 	/**
+	 * @param int  $meta
+	 * @param bool $isHead
+	 *
 	 * @return int
 	 */
-	private function getOtherHalfSide() : int{
-		return $this->head ? Facing::opposite($this->facing) : $this->facing;
+	public static function getOtherHalfSide(int $meta, bool $isHead = false) : int{
+		$rotation = $meta & 0x03;
+		$side = -1;
+
+		switch($rotation){
+			case 0x00: //South
+				$side = Vector3::SIDE_SOUTH;
+				break;
+			case 0x01: //West
+				$side = Vector3::SIDE_WEST;
+				break;
+			case 0x02: //North
+				$side = Vector3::SIDE_NORTH;
+				break;
+			case 0x03: //East
+				$side = Vector3::SIDE_EAST;
+				break;
+		}
+
+		if($isHead){
+			$side = Vector3::getOppositeSide($side);
+		}
+
+		return $side;
 	}
 
 	/**
 	 * @return Bed|null
 	 */
 	public function getOtherHalf() : ?Bed{
-		$other = $this->getSide($this->getOtherHalfSide());
-		if($other instanceof Bed and $other->head !== $this->head and $other->facing === $this->facing){
+		$other = $this->getSide(self::getOtherHalfSide($this->meta, $this->isHeadPart()));
+		if($other instanceof Bed and $other->getId() === $this->getId() and $other->isHeadPart() !== $this->isHeadPart() and (($other->getDamage() & 0x03) === ($this->getDamage() & 0x03))){
 			return $other;
 		}
 
@@ -168,16 +172,13 @@ class Bed extends Transparent{
 	}
 
 	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null) : bool{
-		$down = $this->getSide(Facing::DOWN);
+		$down = $this->getSide(Vector3::SIDE_DOWN);
 		if(!$down->isTransparent()){
-			$this->facing = $player !== null ? Bearing::toFacing($player->getDirection()) : Facing::NORTH;
-
-			$next = $this->getSide($this->getOtherHalfSide());
-			if($next->canBeReplaced() and !$next->getSide(Facing::DOWN)->isTransparent()){
-				parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
-				$nextState = clone $this;
-				$nextState->head = true;
-				$this->getLevel()->setBlock($next, $nextState);
+			$meta = (($player instanceof Player ? $player->getDirection() : 0) - 1) & 0x03;
+			$next = $this->getSide(self::getOtherHalfSide($meta));
+			if($next->canBeReplaced() and !$next->getSide(Vector3::SIDE_DOWN)->isTransparent()){
+				$this->getLevel()->setBlock($blockReplace, BlockFactory::get($this->id, $meta), true, true);
+				$this->getLevel()->setBlock($next, BlockFactory::get($this->id, $meta | self::BITFLAG_HEAD), true, true);
 
 				Tile::createTile(Tile::BED, $this->getLevel(), TileBed::createNBT($this, $face, $item, $player));
 				Tile::createTile(Tile::BED, $this->getLevel(), TileBed::createNBT($next, $face, $item, $player));
@@ -191,19 +192,19 @@ class Bed extends Transparent{
 
 	public function getDropsForCompatibleTool(Item $item) : array{
 		if($this->isHeadPart()){
-			return parent::getDropsForCompatibleTool($item);
+			$tile = $this->getLevel()->getTile($this);
+			if($tile instanceof TileBed){
+				return [
+					ItemFactory::get($this->getItemId(), $tile->getColor())
+				];
+			}else{
+				return [
+					ItemFactory::get($this->getItemId(), 14) //Red
+				];
+			}
 		}
 
 		return [];
-	}
-
-	public function getItem() : Item{
-		$tile = $this->getLevel()->getTile($this);
-		if($tile instanceof TileBed){
-			return ItemFactory::get($this->getItemId(), $tile->getColor());
-		}
-
-		return ItemFactory::get($this->getItemId(), 14); //Red
 	}
 
 	public function isAffectedBySilkTouch() : bool{

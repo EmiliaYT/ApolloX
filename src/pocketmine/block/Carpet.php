@@ -24,13 +24,19 @@ declare(strict_types=1);
 
 namespace pocketmine\block;
 
+use pocketmine\block\utils\ColorBlockMetaHelper;
 use pocketmine\item\Item;
 use pocketmine\math\AxisAlignedBB;
-use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 class Carpet extends Flowable{
+
+	protected $id = self::CARPET;
+
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
+	}
 
 	public function getHardness() : float{
 		return 0.1;
@@ -40,21 +46,27 @@ class Carpet extends Flowable{
 		return true;
 	}
 
+	public function getName() : string{
+		return ColorBlockMetaHelper::getColorFromMeta($this->meta) . " Carpet";
+	}
+
 	protected function recalculateBoundingBox() : ?AxisAlignedBB{
 		return new AxisAlignedBB(0, 0, 0, 1, 0.0625, 1);
 	}
 
 	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null) : bool{
-		$down = $this->getSide(Facing::DOWN);
+		$down = $this->getSide(Vector3::SIDE_DOWN);
 		if($down->getId() !== self::AIR){
-			return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
+			$this->getLevel()->setBlock($blockReplace, $this, true, true);
+
+			return true;
 		}
 
 		return false;
 	}
 
 	public function onNearbyBlockChange() : void{
-		if($this->getSide(Facing::DOWN)->getId() === self::AIR){
+		if($this->getSide(Vector3::SIDE_DOWN)->getId() === self::AIR){
 			$this->getLevel()->useBreakOn($this);
 		}
 	}

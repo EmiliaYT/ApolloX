@@ -30,29 +30,8 @@ class Tripwire extends Flowable{
 
 	protected $id = self::TRIPWIRE;
 
-	/** @var bool */
-	protected $triggered = false;
-	/** @var bool */
-	protected $connected = false;
-	/** @var bool */
-	protected $disarmed = false;
-
-	public function __construct(){
-
-	}
-
-	protected function writeStateToMeta() : int{
-		return ($this->triggered ? 0x01 : 0) | ($this->connected ? 0x04 : 0) | ($this->disarmed ? 0x08 : 0);
-	}
-
-	public function readStateFromMeta(int $meta) : void{
-		$this->triggered = ($meta & 0x01) !== 0;
-		$this->connected = ($meta & 0x04) !== 0;
-		$this->disarmed = ($meta & 0x08) !== 0;
-	}
-
-	public function getStateBitmask() : int{
-		return 0b1111;
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
 	}
 
 	public function getName() : string{

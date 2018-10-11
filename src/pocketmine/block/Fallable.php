@@ -25,14 +25,14 @@ declare(strict_types=1);
 namespace pocketmine\block;
 
 use pocketmine\entity\Entity;
-use pocketmine\math\Facing;
+use pocketmine\math\Vector3;
 
 abstract class Fallable extends Solid{
 
 	public function onNearbyBlockChange() : void{
-		$down = $this->getSide(Facing::DOWN);
+		$down = $this->getSide(Vector3::SIDE_DOWN);
 		if($down->getId() === self::AIR or $down instanceof Liquid or $down instanceof Fire){
-			$this->level->setBlock($this, BlockFactory::get(Block::AIR));
+			$this->level->setBlock($this, BlockFactory::get(Block::AIR), true);
 
 			$nbt = Entity::createBaseNBT($this->add(0.5, 0, 0.5));
 			$nbt->setInt("TileID", $this->getId());

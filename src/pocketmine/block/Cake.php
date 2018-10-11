@@ -29,7 +29,6 @@ use pocketmine\entity\Living;
 use pocketmine\item\FoodSource;
 use pocketmine\item\Item;
 use pocketmine\math\AxisAlignedBB;
-use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -37,25 +36,8 @@ class Cake extends Transparent implements FoodSource{
 
 	protected $id = self::CAKE_BLOCK;
 
-	protected $itemId = Item::CAKE;
-
-	/** @var int */
-	protected $bites = 0;
-
-	public function __construct(){
-
-	}
-
-	protected function writeStateToMeta() : int{
-		return $this->bites;
-	}
-
-	public function readStateFromMeta(int $meta) : void{
-		$this->bites = $meta;
-	}
-
-	public function getStateBitmask() : int{
-		return 0b111;
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
 	}
 
 	public function getHardness() : float{
@@ -67,7 +49,7 @@ class Cake extends Transparent implements FoodSource{
 	}
 
 	protected function recalculateBoundingBox() : ?AxisAlignedBB{
-		$f = $this->bites * 0.125; //1 slice width
+		$f = $this->getDamage() * 0.125; //1 slice width
 
 		return new AxisAlignedBB(
 			0.0625 + $f,
@@ -80,17 +62,19 @@ class Cake extends Transparent implements FoodSource{
 	}
 
 	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null) : bool{
-		$down = $this->getSide(Facing::DOWN);
+		$down = $this->getSide(Vector3::SIDE_DOWN);
 		if($down->getId() !== self::AIR){
-			return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
+			$this->getLevel()->setBlock($blockReplace, $this, true, true);
+
+			return true;
 		}
 
 		return false;
 	}
 
 	public function onNearbyBlockChange() : void{
-		if($this->getSide(Facing::DOWN)->getId() === self::AIR){ //Replace with common break method
-			$this->getLevel()->setBlock($this, BlockFactory::get(Block::AIR));
+		if($this->getSide(Vector3::SIDE_DOWN)->getId() === self::AIR){ //Replace with common break method
+			$this->getLevel()->setBlock($this, BlockFactory::get(Block::AIR), true);
 		}
 	}
 
@@ -128,8 +112,8 @@ class Cake extends Transparent implements FoodSource{
 	 */
 	public function getResidue(){
 		$clone = clone $this;
-		$clone->bites++;
-		if($clone->bites > 6){
+		$clone->meta++;
+		if($clone->meta > 0x06){
 			$clone = BlockFactory::get(Block::AIR);
 		}
 		return $clone;

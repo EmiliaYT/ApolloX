@@ -26,29 +26,10 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\level\sound\DoorSound;
 use pocketmine\math\AxisAlignedBB;
-use pocketmine\math\Bearing;
-use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 class FenceGate extends Transparent{
-	/** @var bool */
-	protected $open = false;
-	/** @var int */
-	protected $facing = Facing::NORTH;
-
-	protected function writeStateToMeta() : int{
-		return Bearing::fromFacing($this->facing) | ($this->open ? 0x04 : 0);
-	}
-
-	public function readStateFromMeta(int $meta) : void{
-		$this->facing = Bearing::toFacing($meta & 0x03);
-		$this->open = ($meta & 0x04) !== 0;
-	}
-
-	public function getStateBitmask() : int{
-		return 0b111;
-	}
 
 	public function getHardness() : float{
 		return 2;
@@ -60,11 +41,12 @@ class FenceGate extends Transparent{
 
 
 	protected function recalculateBoundingBox() : ?AxisAlignedBB{
-		if($this->open){
+		if(($this->getDamage() & 0x04) > 0){
 			return null;
 		}
 
-		if(Facing::axis($this->facing) === Facing::AXIS_Z){
+		$i = ($this->getDamage() & 0x03);
+		if($i === 2 or $i === 0){
 			return new AxisAlignedBB(
 				0,
 				0,
@@ -86,23 +68,24 @@ class FenceGate extends Transparent{
 	}
 
 	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null) : bool{
-		if($player !== null){
-			$this->facing = Bearing::toFacing($player->getDirection());
-		}
+		$this->meta = ($player instanceof Player ? ($player->getDirection() - 1) & 0x03 : 0);
+		$this->getLevel()->setBlock($blockReplace, $this, true, true);
 
-		return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
+		return true;
+	}
+
+	public function getVariantBitmask() : int{
+		return 0;
 	}
 
 	public function onActivate(Item $item, Player $player = null) : bool{
-		$this->open = !$this->open;
-		if($this->open and $player !== null){
-			$playerFacing = Bearing::toFacing($player->getDirection());
-			if($playerFacing === Facing::opposite($this->facing)){
-				$this->facing = $playerFacing;
-			}
+		$this->meta = (($this->meta ^ 0x04) & ~0x02);
+
+		if($player !== null){
+			$this->meta |= (($player->getDirection() - 1) & 0x02);
 		}
 
-		$this->getLevel()->setBlock($this, $this);
+		$this->getLevel()->setBlock($this, $this, true);
 		$this->level->addSound(new DoorSound($this));
 		return true;
 	}

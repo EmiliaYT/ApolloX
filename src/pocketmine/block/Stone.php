@@ -36,6 +36,12 @@ class Stone extends Solid{
 	public const ANDESITE = 5;
 	public const POLISHED_ANDESITE = 6;
 
+	protected $id = self::STONE;
+
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
+	}
+
 	public function getHardness() : float{
 		return 1.5;
 	}
@@ -46,5 +52,28 @@ class Stone extends Solid{
 
 	public function getToolHarvestLevel() : int{
 		return TieredTool::TIER_WOODEN;
+	}
+
+	public function getName() : string{
+		static $names = [
+			self::NORMAL => "Stone",
+			self::GRANITE => "Granite",
+			self::POLISHED_GRANITE => "Polished Granite",
+			self::DIORITE => "Diorite",
+			self::POLISHED_DIORITE => "Polished Diorite",
+			self::ANDESITE => "Andesite",
+			self::POLISHED_ANDESITE => "Polished Andesite"
+		];
+		return $names[$this->getVariant()] ?? "Unknown";
+	}
+
+	public function getDropsForCompatibleTool(Item $item) : array{
+		if($this->getDamage() === self::NORMAL){
+			return [
+				ItemFactory::get(Item::COBBLESTONE, $this->getDamage())
+			];
+		}
+
+		return parent::getDropsForCompatibleTool($item);
 	}
 }

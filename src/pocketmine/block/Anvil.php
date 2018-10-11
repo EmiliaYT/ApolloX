@@ -27,8 +27,6 @@ use pocketmine\inventory\AnvilInventory;
 use pocketmine\item\TieredTool;
 use pocketmine\item\Item;
 use pocketmine\math\AxisAlignedBB;
-use pocketmine\math\Bearing;
-use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -38,19 +36,10 @@ class Anvil extends Fallable{
 	public const TYPE_SLIGHTLY_DAMAGED = 4;
 	public const TYPE_VERY_DAMAGED = 8;
 
-	/** @var int */
-	protected $facing = Facing::NORTH;
+	protected $id = self::ANVIL;
 
-	protected function writeStateToMeta() : int{
-		return Bearing::fromFacing($this->facing);
-	}
-
-	public function readStateFromMeta(int $meta) : void{
-		$this->facing = Bearing::toFacing($meta);
-	}
-
-	public function getStateBitmask() : int{
-		return 0b11;
+	public function __construct(int $meta = 0){
+		$this->meta = $meta;
 	}
 
 	public function isTransparent() : bool{
@@ -65,6 +54,19 @@ class Anvil extends Fallable{
 		return 6000;
 	}
 
+	public function getVariantBitmask() : int{
+		return 0x0c;
+	}
+
+	public function getName() : string{
+		static $names = [
+			self::TYPE_NORMAL => "Anvil",
+			self::TYPE_SLIGHTLY_DAMAGED => "Slightly Damaged Anvil",
+			self::TYPE_VERY_DAMAGED => "Very Damaged Anvil"
+		];
+		return $names[$this->getVariant()] ?? "Anvil";
+	}
+
 	public function getToolType() : int{
 		return BlockToolType::TYPE_PICKAXE;
 	}
@@ -76,7 +78,7 @@ class Anvil extends Fallable{
 	public function recalculateBoundingBox() : ?AxisAlignedBB{
 		$inset = 0.125;
 
-		if(Facing::axis($this->facing) === Facing::AXIS_X){
+		if($this->meta & 0x01){ //east/west
 			return new AxisAlignedBB(0, 0, $inset, 1, 1, 1 - $inset);
 		}else{
 			return new AxisAlignedBB($inset, 0, 0, 1 - $inset, 1, 1);
@@ -92,9 +94,8 @@ class Anvil extends Fallable{
 	}
 
 	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null) : bool{
-		if($player !== null){
-			$this->facing = Bearing::toFacing(Bearing::rotate($player->getDirection(), 1));
-		}
-		return parent::place($item, $blockReplace, $blockClicked, $face, $clickVector, $player);
+		$direction = ($player !== null ? $player->getDirection() : 0) & 0x03;
+		$this->meta = $this->getVariant() | $direction;
+		return $this->getLevel()->setBlock($blockReplace, $this, true, true);
 	}
 }
