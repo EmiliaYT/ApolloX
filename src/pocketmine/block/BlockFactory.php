@@ -402,11 +402,11 @@ class BlockFactory{
 			throw new \InvalidArgumentException("Block ID $id is out of bounds");
 		}
 
-		if($block !== null){
-			$block->readStateFromMeta($state);
-		}else{
-			$block = new UnknownBlock($id, $meta);
-		}
+	//	if($block !== null){
+	//		$block->readStateFromMeta($state);
+	//	}else{
+	//		$block = new UnknownBlock($id, $meta);
+	//	}
 
 		if($pos !== null){
 			$block->x = $pos->getFloorX();
