@@ -23,19 +23,18 @@ declare(strict_types=1);
 
 namespace pocketmine\level\generator\normal\biome;
 
-use pocketmine\level\generator\biome\Biome;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 
-abstract class SnowyBiome extends Biome{
+abstract class SnowyBiome extends NormalBiome{
 
 	public function __construct(){
 		$this->setGroundCover([
-			BlockFactory::get(Block::SNOW_LAYER),
-			BlockFactory::get(Block::GRASS),
-			BlockFactory::get(Block::DIRT),
-			BlockFactory::get(Block::DIRT),
-			BlockFactory::get(Block::DIRT)
+			BlockFactory::get(Block::SNOW_LAYER, 0),
+			BlockFactory::get(Block::GRASS, 0),
+			BlockFactory::get(Block::DIRT, 0),
+			BlockFactory::get(Block::DIRT, 0),
+			BlockFactory::get(Block::DIRT, 0)
 		]);
 	}
 }

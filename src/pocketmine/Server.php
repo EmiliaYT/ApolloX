@@ -11,7 +11,7 @@ declare(strict_types=1);
 \_/ \_/ .__/| .__/ \___/|_|_|\___/\_____/\__/  
       |_|   |_|                                
 	  
-**/
+ */
 
 namespace pocketmine;
 
@@ -1806,13 +1806,11 @@ class Server{
 					$default = "world";
 					$this->setConfigString("level-name", "world");
 				}
-				
 				if(!$this->loadLevel($default)){
 					$this->generateLevel($default, Generator::convertSeed($this->getConfigString("level-seed")));
 				}
-				
+
 				$this->setDefaultLevel($this->getLevelByName($default));
-				
 			}
 
 			if($this->allowNether and $this->getNetherLevel() === null){
