@@ -24,8 +24,9 @@ declare(strict_types=1);
 
 namespace pocketmine\block;
 
-use pocketmine\block\utils\ColorBlockMetaHelper;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Player;
@@ -34,18 +35,8 @@ use pocketmine\tile\Tile;
 
 class ShulkerBox extends Transparent{
 
-	protected $id = self::SHULKER_BOX;
-
-	public function __construct(int $meta = 0){
-		$this->meta = $meta;
-	}
-
 	public function getHardness() : float{
 		return 6;
-	}
-
-	public function getName() : string{
-		return ColorBlockMetaHelper::getColorFromMeta($this->getVariant()) . " Shulker Box";
 	}
 
 	public function getToolType() : int{
@@ -54,13 +45,13 @@ class ShulkerBox extends Transparent{
 
 	public function place(Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, Player $player = null) : bool{
 		$this->getLevel()->setBlock($blockReplace, $this, true, true);
+
 		Tile::createTile(Tile::SHULKER_BOX, $this->getLevel(), TileShulkerBox::createNBT($this, $face, $item, $player));
 		return true;
 	}
 
 	public function onActivate(Item $item, Player $player = null) : bool{
 		if($player instanceof Player){
-
 			$t = $this->getLevel()->getTile($this);
 			$sb = null;
 			if($t instanceof TileShulkerBox){
@@ -69,10 +60,7 @@ class ShulkerBox extends Transparent{
 				$sb = Tile::createTile(Tile::SHULKER_BOX, $this->getLevel(), TileShulkerBox::createNBT($this));
 			}
 
-			if(
-				!($this->getSide(Vector3::SIDE_UP)->isTransparent()) or
-				!$sb->canOpenWith($item->getCustomName())
-			){
+			if(!($this->getSide(Facing::UP)->isTransparent()) or !$sb->canOpenWith($item->getCustomName())){
 				return true;
 			}
 
@@ -89,7 +77,7 @@ class ShulkerBox extends Transparent{
 	public function getDropsForCompatibleTool(Item $item) : array{
 		$t = $this->getLevel()->getTile($this);
 		if($t instanceof TileShulkerBox){
-			$item = Item::get(Item::SHULKER_BOX, $this->meta, 1);
+			$item = ItemFactory::get(Item::SHULKER_BOX, $this->getVariant(), 1);
 			$itemNBT = new CompoundTag();
 			$t->writeSaveData($itemNBT);
 			$item->setCustomBlockData($itemNBT);
@@ -106,9 +94,5 @@ class ShulkerBox extends Transparent{
 			$tile->getInventory()->clearAll(false);
 		}
 		return parent::onBreak($item, $player);
-	}
-
-	public function getVariantBitmask(): int{
-		return 0x0f;
 	}
 }
