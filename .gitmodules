@@ -6,4 +6,4 @@
 	url = https://github.com/pmmp/PocketMine-DevTools.git
 [submodule "src/pocketmine/resources/vanilla"]
 	path = src/pocketmine/resources/vanilla
-	url = https://github.com/pmmp/BedrockData.gi
+	url = https://github.com/pmmp/BedrockData.git
