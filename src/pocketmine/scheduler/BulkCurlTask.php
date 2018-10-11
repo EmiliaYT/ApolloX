@@ -49,7 +49,7 @@ class BulkCurlTask extends AsyncTask{
 		$this->operations = serialize($operations);
 	}
 
-	public function onRun() : void{
+	public function onRun(){
 		$operations = unserialize($this->operations);
 		$results = [];
 		foreach($operations as $op){
