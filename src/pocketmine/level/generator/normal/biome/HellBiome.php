@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace pocketmine\level\generator\normal\biome;
 
+use pocketmine\level\generator\biome\Biome;
+
 class HellBiome extends Biome{
 
 	public function getName() : string{
