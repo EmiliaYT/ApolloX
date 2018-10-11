@@ -21,15 +21,22 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\level\generator\normal\biome;
+namespace pocketmine\level\generator\biome;
 
+use pocketmine\block\Block;
+use pocketmine\block\BlockFactory;
 use pocketmine\level\generator\populator\TallGrass;
-use net\daporkchop\world\biome\abs\WaterBiome;
 
-class RiverBiome extends WaterBiome{
+class RiverBiome extends Biome{
 
 	public function __construct(){
-		parent::__construct();
+		$this->setGroundCover([
+			BlockFactory::get(Block::DIRT),
+			BlockFactory::get(Block::DIRT),
+			BlockFactory::get(Block::DIRT),
+			BlockFactory::get(Block::DIRT),
+			BlockFactory::get(Block::DIRT)
+		]);
 
 		$tallGrass = new TallGrass();
 		$tallGrass->setBaseAmount(5);
