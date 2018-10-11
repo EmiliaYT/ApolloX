@@ -22,7 +22,7 @@
 
 declare(strict_types=1);
 
-namespace pocketmine\level\generator\biome;
+namespace pocketmine\level\generator\normal\biome;
 
 class EndBiome extends Biome{
 
