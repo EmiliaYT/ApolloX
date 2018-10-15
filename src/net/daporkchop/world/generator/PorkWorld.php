@@ -82,8 +82,8 @@ class PorkWorld extends Generator
         $this->level = $level;
         $this->selector = new PorkBiomeSelector($this->random, Biome::getBiome(Biome::OCEAN));
         $this->generationPopulators[] = new GroundCover();
-		$cave = new Cave();
-	    $this->populators[] = $cave;
+	//	$cave = new Cave();
+   //   $this->populators[] = $cave;
         $ores = new Ore();
         $ores->setOreTypes([
             new OreType(BlockFactory::get(Block::COAL_ORE), 20, 16, 0, 128),
