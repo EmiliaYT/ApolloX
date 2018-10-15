@@ -14,6 +14,8 @@ use pocketmine\level\generator\populator\Ore;
 use net\daporkchop\world\noise\NoiseGeneratorOctaves3D;
 use net\daporkchop\world\PorkBiomeSelector;
 use pocketmine\block\Stone;
+use pocketmine\level\generator\populator\Cave;
+
 
 /**
  * this class is painstakingly ported over to PHP from https://github.com/Barteks2x/173generator/blob/master/src/main/java/com/github/barteks2x/b173gen/generator/ChunkProviderGenerate.java
@@ -80,6 +82,8 @@ class PorkWorld extends Generator
         $this->level = $level;
         $this->selector = new PorkBiomeSelector($this->random, Biome::getBiome(Biome::OCEAN));
         $this->generationPopulators[] = new GroundCover();
+		$cave = new Cave();
+	    $this->populators[] = $cave;
         $ores = new Ore();
         $ores->setOreTypes([
             new OreType(BlockFactory::get(Block::COAL_ORE), 20, 16, 0, 128),
