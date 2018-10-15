@@ -45,7 +45,7 @@ class Cave extends Populator {
 	 * @param              $chunkZ
 	 * @param Random       $random
 	 */
-	private function pop(ChunkManager $level, int $chunkX, int $chunkZ, Random $random) : void{
+	private function pop(ChunkManager $level, $x, $z, int $chunkX, int $chunkZ, Random $random) : void{
 		$c = $level->getChunk($x, $z);
 		$oC = $level->getChunk($chunkX, $chunkZ);
 		if($c == null or $oC == null or ($c != null and !$c->isGenerated()) or ($oC != null and !$oC->isGenerated())){
