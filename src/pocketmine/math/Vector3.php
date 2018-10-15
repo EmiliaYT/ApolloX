@@ -401,4 +401,12 @@ class Vector3{
 		return "Vector3(x=" . $this->x . ",y=" . $this->y . ",z=" . $this->z . ")";
 	}
 
+	/**
+	 * @param Random $random
+	 *
+	 * @return Vector3
+	 */
+	public static function createRandomDirection(Random $random){
+		return VectorMath::getDirection3D($random->nextFloat() * 2 * pi(), $random->nextFloat() * 2 * pi());
+	}
 }
