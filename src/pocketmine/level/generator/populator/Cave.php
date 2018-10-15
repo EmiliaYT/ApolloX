@@ -117,7 +117,7 @@ class Cave extends Populator {
 		for(; $startingNode < $nodeAmount; $startingNode++){
 			$horizontalSize = 1.5 + sin($startingNode * pi() / $nodeAmount) * $horizontalScale;
 			$verticalSize = $horizontalSize * $verticalScale;
-			$target = $target->add(VectorMath::getDirection3D($horizontalAngle, $verticalAngle));
+	//		$target = $target->add(VectorMath::getDirection3D($horizontalAngle, $verticalAngle));
 			if($extraVerticalScale){
 				$verticalAngle *= 0.92;
 			}else{
