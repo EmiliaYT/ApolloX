@@ -2,7 +2,7 @@
 
 namespace pocketmine\level\generator\populator;
 
-use pocketmine\block\Block;
+use pocketmine\block\BlockFactory as block;
 use pocketmine\level\ChunkManager;
 use pocketmine\math\Math;
 use pocketmine\math\Vector3;
