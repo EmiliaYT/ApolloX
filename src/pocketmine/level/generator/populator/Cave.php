@@ -18,7 +18,7 @@ class Cave extends Populator {
 	 *
 	 * @return mixed|void
 	 */
-	public function populate(ChunkManager $level, $chunkX, $chunkZ, Random $random){
+	public function populate(ChunkManager $level, int $chunkX, int $chunkZ, Random $random) : void{
 		$overLap = 8;
 		$firstSeed = $random->nextInt();
 		$secondSeed = $random->nextInt();
@@ -45,7 +45,7 @@ class Cave extends Populator {
 	 * @param              $chunkZ
 	 * @param Random       $random
 	 */
-	private function pop(ChunkManager $level, $x, $z, $chunkX, $chunkZ, Random $random){
+	private function pop(ChunkManager $level, $x, $z, int $chunkX, int $chunkZ, Random $random) : void{
 		$c = $level->getChunk($x, $z);
 		$oC = $level->getChunk($chunkX, $chunkZ);
 		if($c == null or $oC == null or ($c != null and !$c->isGenerated()) or ($oC != null and !$oC->isGenerated())){
@@ -117,7 +117,7 @@ class Cave extends Populator {
 		for(; $startingNode < $nodeAmount; $startingNode++){
 			$horizontalSize = 1.5 + sin($startingNode * pi() / $nodeAmount) * $horizontalScale;
 			$verticalSize = $horizontalSize * $verticalScale;
-			$target = $target->add(VectorMath::getDirection3D($horizontalAngle, $verticalAngle));
+	//		$target = $target->add(VectorMath::getDirection3D($horizontalAngle, $verticalAngle));
 			if($extraVerticalScale){
 				$verticalAngle *= 0.92;
 			}else{
