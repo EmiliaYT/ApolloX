@@ -7,10 +7,10 @@ player:
 dimensions:
   # Choose if the nether is allowed. The level of nether will generate automatically
   nether:
-    active: true
+    active: false
     level-name: "nether"
   end:
-    active: true
+    active: false
     level-name: "end"
 
 developer:
