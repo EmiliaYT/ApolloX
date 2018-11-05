@@ -26,20 +26,18 @@ namespace pocketmine\command\defaults;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\utils\InvalidCommandSyntaxException;
+use pocketmine\event\server\UnbanEvent;
 use pocketmine\lang\TranslationContainer;
 use pocketmine\network\mcpe\protocol\types\CommandParameter;
 
 class PardonCommand extends VanillaCommand{
 
 	public function __construct(string $name){
-		parent::__construct(
-			$name,
-			"%pocketmine.command.unban.player.description",
-			"%commands.unban.usage",
-            [], [[
-                new CommandParameter("player", CommandParameter::ARG_TYPE_TARGET, false)
-            ]]
-		);
+		parent::__construct($name, "%pocketmine.command.unban.player.description", "%commands.unban.usage", ["unban"], [
+			[
+				new CommandParameter("player", CommandParameter::ARG_TYPE_TARGET, false)
+			]
+		]);
 		$this->setPermission("pocketmine.command.unban.player");
 	}
 
@@ -51,7 +49,8 @@ class PardonCommand extends VanillaCommand{
 		if(count($args) !== 1){
 			throw new InvalidCommandSyntaxException();
 		}
-
+		$event = new UnbanEvent($args[0], $sender);
+		$event->call();
 		$sender->getServer()->getNameBans()->remove($args[0]);
 
 		Command::broadcastCommandMessage($sender, new TranslationContainer("commands.unban.success", [$args[0]]));

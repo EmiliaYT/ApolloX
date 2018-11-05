@@ -23,17 +23,26 @@ declare(strict_types=1);
 
 namespace pocketmine\entity;
 
+use pocketmine\block\Block;
+use pocketmine\block\Grass;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\EntityEventPacket;
 use pocketmine\Player;
 
 abstract class Animal extends Mob implements Ageable{
 
 	protected $inLove = 0;
+	protected $spawnableBlock = Block::GRASS;
 
-	public function isBaby() : bool{
-		return $this->getGenericFlag(self::DATA_FLAG_BABY);
+	public function getBlockPathWeight(Vector3 $pos) : float{
+		return $this->level->getBlock($pos->down()) instanceof Grass ? 10 : max($this->level->getBlockSkyLightAt($pos->getFloorX(), $pos->getFloorY(), $pos->getFloorZ()),
+				$this->level->getBlockLightAt($pos->getFloorX(), $pos->getFloorY(), $pos->getFloorZ())) - 0.5;
+	}
+
+	public function canSpawnHere() : bool{
+		return $this->level->getBlock($this->down())->getId() === $this->spawnableBlock and  $this->level->getBlockSkyLightAt($this->getFloorX(), $this->getFloorY(), $this->getFloorZ()) > 8 and parent::canSpawnHere();
 	}
 
 	public function getTalkInterval() : int{
@@ -45,7 +54,7 @@ abstract class Animal extends Mob implements Ageable{
 	}
 
 	public function onInteract(Player $player, Item $item, Vector3 $clickPos, int $slot) : bool{
-		if($this->isBreedingItem($item) and $this->aiEnabled){
+		if($this->isBreedingItem($item) and !$this->isImmobile()){
 			if(!$this->isBaby() and !$this->isInLove()){
 				$this->setInLove(true);
 
@@ -83,7 +92,24 @@ abstract class Animal extends Mob implements Ageable{
 		$this->broadcastEntityEvent(EntityEventPacket::EATING_ITEM, $item->getId());
 	}
 
+	public function eatGrassBonus(Vector3 $pos) : void{
+		// for sheep
+	}
+
 	public function allowLeashing() : bool{
-		return !$this->isLeashed() and $this->aiEnabled;
+		return !$this->isLeashed() and !$this->isImmobile();
+	}
+
+	protected function initEntity(CompoundTag $nbt) : void{
+		parent::initEntity($nbt);
+
+		$this->inLove = $nbt->getInt("InLove", 0);
+	}
+
+	public function saveNBT() : CompoundTag{
+		$nbt = parent::saveNBT();
+		$nbt->setInt("InLove", $this->inLove);
+
+		return $nbt;
 	}
 }

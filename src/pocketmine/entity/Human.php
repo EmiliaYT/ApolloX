@@ -264,7 +264,8 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	 * @return float the amount of exhaustion level increased
 	 */
 	public function exhaust(float $amount, int $cause = PlayerExhaustEvent::CAUSE_CUSTOM) : float{
-		$this->server->getPluginManager()->callEvent($ev = new PlayerExhaustEvent($this, $amount, $cause));
+		$ev = new PlayerExhaustEvent($this, $amount, $cause);
+		$ev->call();
 		if($ev->isCancelled()){
 			return 0.0;
 		}
@@ -461,7 +462,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	protected function setXpAndProgress(?int $level, ?float $progress) : bool{
 		if(!$this->justCreated){
 			$ev = new PlayerExperienceChangeEvent($this, $this->getXpLevel(), $this->getXpProgress(), $level, $progress);
-			$this->server->getPluginManager()->callEvent($ev);
+			$ev->call();
 
 			if($ev->isCancelled()){
 				return false;
@@ -586,8 +587,6 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 			$this->setSkin(new Skin($skin->getString("Name"), $skin->hasTag("Data", StringTag::class) ? $skin->getString("Data") : $skin->getByteArray("Data"), //old data (this used to be saved as a StringTag in older versions of PM)
 				$skin->hasTag("CapeData", ByteArrayTag::class) ? $skin->getByteArray("CapeData", "") : $skin->getString("CapeData", ""), $skin->getString("GeometryName", ""), $skin->hasTag("GeometryData", ByteArrayTag::class) ? $skin->getByteArray("GeometryData", "") : $skin->getString("GeometryData", "")));
 		}
-
-		$this->uuid = UUID::fromData((string) $this->getId(), $this->skin->getSkinData(), $this->getNameTag());
 	}
 
 	protected function initEntity(CompoundTag $nbt) : void{
@@ -833,7 +832,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 			/* we don't use Server->updatePlayerListData() because that uses batches, which could cause race conditions in async compression mode */
 			$pk = new PlayerListPacket();
 			$pk->type = PlayerListPacket::TYPE_ADD;
-			$pk->entries = [PlayerListEntry::createAdditionEntry($this->uuid, $this->id, $this->getName(), $this->getName(), 0, $this->skin)];
+			$pk->entries = [PlayerListEntry::createAdditionEntry($this->uuid, $this->id, $this->getName(), $this->skin)];
 			$player->sendDataPacket($pk);
 		}
 

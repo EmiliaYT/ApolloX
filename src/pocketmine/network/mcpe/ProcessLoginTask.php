@@ -35,7 +35,6 @@ use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\Player;
 use pocketmine\scheduler\AsyncTask;
-use pocketmine\Server;
 
 class ProcessLoginTask extends AsyncTask{
 
@@ -199,7 +198,7 @@ class ProcessLoginTask extends AsyncTask{
 		$decodedSig = (new DerSignatureSerializer())->parse($sig);
 		$jwtSig = self::b64UrlEncode(
 			hex2bin(str_pad(gmp_strval($decodedSig->getR(), 16), 96, "0", STR_PAD_LEFT)) .
-			hex2bin(str_pad(gmp_strval($decodedSig->getS(), 16), 96, "0", STR_PAD_LEFT)) //onCompletion
+			hex2bin(str_pad(gmp_strval($decodedSig->getS(), 16), 96, "0", STR_PAD_LEFT))
 		);
 
 		return "$jwtBody.$jwtSig";
@@ -216,7 +215,7 @@ class ProcessLoginTask extends AsyncTask{
 		return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
 	}
 
-	public function onCompletion(Server $server){
+	public function onCompletion() : void{
 		/** @var Player $player */
 		$player = $this->fetchLocal();
 		if(!$player->isConnected()){

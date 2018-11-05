@@ -37,12 +37,14 @@ class Mooshroom extends Cow{
 
 	public const NETWORK_ID = self::MOOSHROOM;
 
+	protected $spawnableBlock = Block::MYCELIUM;
+
 	public function getName() : string{
 		return "Mooshroom";
 	}
 
 	public function onInteract(Player $player, Item $item, Vector3 $clickPos, int $slot) : bool{
-		if($this->aiEnabled){
+		if(!$this->isImmobile()){
 			if($item instanceof Bowl and !$this->isBaby()){
 				$new = ItemFactory::get(Item::MUSHROOM_STEW);
 				if($player->isSurvival()){
@@ -61,7 +63,7 @@ class Mooshroom extends Cow{
 				$cow->setRotation($this->yaw, $this->pitch);
 				$cow->setHealth($this->getHealth());
 				$cow->setNameTag($this->getNameTag());
-				$cow->setAiEnabled($this->server->mobAiEnabled);
+				$cow->setImmobile(!$this->server->mobAiEnabled);
 
 				$item->applyDamage(1);
 
@@ -73,9 +75,8 @@ class Mooshroom extends Cow{
 				$cow->spawnToAll();
 
 				return true;
-			}else{
-				return parent::onInteract($player, $item, $clickPos, $slot);
 			}
 		}
+        return parent::onInteract($player, $item, $clickPos, $slot);
 	}
 }

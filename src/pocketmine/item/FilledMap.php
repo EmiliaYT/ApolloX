@@ -87,27 +87,28 @@ class FilledMap extends Item{
 		if($zoom > 4){
 			$zoom = 4;
 		}
-		$this->setNamedTagEntry(new ByteTag(self::TAG_ZOOM, $zoom));
+		$this->getNamedTag()->setByte(self::TAG_ZOOM, $zoom, true);
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getZoom() : int{
-		return $this->getNamedTag()->getByte(self::TAG_ZOOM, 0);
+		return $this->getNamedTag()->getByte(self::TAG_ZOOM, 0, true);
 	}
 
 	/**
 	 * @param int $mapId
 	 */
 	public function setMapId(int $mapId) : void{
-		$this->setNamedTagEntry(new LongTag(self::TAG_MAP_UUID, $mapId));
+		$this->getNamedTag()->setLong(self::TAG_MAP_UUID, $mapId, true);
+
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getMapId() : int{
-		return $this->getNamedTag()->getLong(self::TAG_MAP_UUID, 0, false);
+		return $this->getNamedTag()->getLong(self::TAG_MAP_UUID, 0, true);
 	}
 }

@@ -164,5 +164,6 @@ interface ProtocolInfo{
 	public const SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET = 0x71;
 	public const UPDATE_SOFT_ENUM_PACKET = 0x72;
 	public const NETWORK_STACK_LATENCY_PACKET = 0x73;
+	public const SCRIPT_CUSTOM_EVENT_PACKET = 0x75;
 
 }

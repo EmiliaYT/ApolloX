@@ -61,7 +61,7 @@ class PreSpawnSessionHandler extends SessionHandler{
 		$pk->pitch = $this->player->pitch;
 		$pk->yaw = $this->player->yaw;
 		$pk->seed = -1;
-		$pk->dimension = DimensionIds::OVERWORLD; //TODO: implement this properly
+		$pk->dimension = $this->player->getLevel()->getDimension();
 		$pk->worldGamemode = Player::getClientFriendlyGamemode($this->server->getGamemode());
 		$pk->difficulty = $this->player->getLevel()->getDifficulty();
 		$pk->spawnX = $spawnPosition->getFloorX();
@@ -75,7 +75,11 @@ class PreSpawnSessionHandler extends SessionHandler{
 		$pk->commandsEnabled = true;
 		$pk->levelId = "";
 		$pk->worldName = $this->server->getMotd();
+		$pk->gameRules = $this->player->level->getGameRules()->getRules();
+
 		$this->session->sendDataPacket($pk);
+
+		$this->player->setImmobile(); //HACK: fix client-side falling pre-spawn
 
 		$this->player->getLevel()->sendTime($this->player);
 
@@ -100,6 +104,8 @@ class PreSpawnSessionHandler extends SessionHandler{
 	}
 
 	public function handleSetLocalPlayerAsInitialized(SetLocalPlayerAsInitializedPacket $packet) : bool{
+		$this->player->setImmobile(false); //HACK: this is set to prevent client-side falling before spawn
+
 		$this->player->doFirstSpawn();
 
 		return true;

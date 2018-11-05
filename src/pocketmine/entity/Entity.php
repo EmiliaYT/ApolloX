@@ -239,40 +239,48 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	public const DATA_FLAG_INTERESTED = 26;
 	public const DATA_FLAG_CHARGED = 27;
 	public const DATA_FLAG_TAMED = 28;
-	public const DATA_FLAG_LEASHED = 29;
-	public const DATA_FLAG_SHEARED = 30;
-	public const DATA_FLAG_GLIDING = 31;
-	public const DATA_FLAG_ELDER = 32;
-	public const DATA_FLAG_MOVING = 33;
-	public const DATA_FLAG_BREATHING = 34;
-	public const DATA_FLAG_CHESTED = 35;
-	public const DATA_FLAG_STACKABLE = 36;
-	public const DATA_FLAG_SHOWBASE = 37;
-	public const DATA_FLAG_REARING = 38;
-	public const DATA_FLAG_VIBRATING = 39;
-	public const DATA_FLAG_IDLING = 40;
-	public const DATA_FLAG_EVOKER_SPELL = 41;
-	public const DATA_FLAG_CHARGE_ATTACK = 42;
-	public const DATA_FLAG_WASD_CONTROLLED = 43;
-	public const DATA_FLAG_CAN_POWER_JUMP = 44;
-	public const DATA_FLAG_LINGER = 45;
-	public const DATA_FLAG_HAS_COLLISION = 46;
-	public const DATA_FLAG_AFFECTED_BY_GRAVITY = 47;
-	public const DATA_FLAG_FIRE_IMMUNE = 48;
-	public const DATA_FLAG_DANCING = 49;
-	public const DATA_FLAG_ENCHANTED = 50;
-	public const DATA_FLAG_SHOW_TRIDENT_ROPE = 51; // tridents show an animated rope when enchanted with loyalty after they are thrown and return to their owner. To be combined with DATA_OWNER_EID
-	public const DATA_FLAG_CONTAINER_PRIVATE = 52; //inventory is private, doesn't drop contents when killed if true
-	//53 TransformationComponent
-	public const DATA_FLAG_SPIN_ATTACK = 54;
-	public const DATA_FLAG_SWIMMING = 55;
-	public const DATA_FLAG_BRIBED = 56; //dolphins have this set when they go to find treasure for the player
+	public const DATA_FLAG_ORPHANED = 29;
+	public const DATA_FLAG_LEASHED = 30;
+	public const DATA_FLAG_SHEARED = 31;
+	public const DATA_FLAG_GLIDING = 32;
+	public const DATA_FLAG_ELDER = 33;
+	public const DATA_FLAG_MOVING = 34;
+	public const DATA_FLAG_BREATHING = 35;
+	public const DATA_FLAG_CHESTED = 36;
+	public const DATA_FLAG_STACKABLE = 37;
+	public const DATA_FLAG_SHOWBASE = 38;
+	public const DATA_FLAG_REARING = 39;
+	public const DATA_FLAG_VIBRATING = 40;
+	public const DATA_FLAG_IDLING = 41;
+	public const DATA_FLAG_EVOKER_SPELL = 42;
+	public const DATA_FLAG_CHARGE_ATTACK = 43;
+	public const DATA_FLAG_WASD_CONTROLLED = 44;
+	public const DATA_FLAG_CAN_POWER_JUMP = 45;
+	public const DATA_FLAG_LINGER = 46;
+	public const DATA_FLAG_HAS_COLLISION = 47;
+	public const DATA_FLAG_AFFECTED_BY_GRAVITY = 48;
+	public const DATA_FLAG_FIRE_IMMUNE = 49;
+	public const DATA_FLAG_DANCING = 50;
+	public const DATA_FLAG_ENCHANTED = 51;
+	public const DATA_FLAG_SHOW_TRIDENT_ROPE = 52; // tridents show an animated rope when enchanted with loyalty after they are thrown and return to their owner. To be combined with DATA_OWNER_EID
+	public const DATA_FLAG_CONTAINER_PRIVATE = 53; //inventory is private, doesn't drop contents when killed if true
+	//54 TransformationComponent
+	public const DATA_FLAG_SPIN_ATTACK = 55;
+	public const DATA_FLAG_SWIMMING = 56;
+	public const DATA_FLAG_BRIBED = 57; //dolphins have this set when they go to find treasure for the player
+	public const DATA_FLAG_PREGNANT = 58;
+	public const DATA_FLAG_LAYING_EGG = 59;
+	//60 ??
 
 	public static $entityCount = 1;
 	/** @var Entity[] */
 	private static $knownEntities = [];
 	/** @var string[][] */
 	private static $saveNames = [];
+	/** @var int[][] */
+	public static $spawnPlacementTypes = [];
+
+	public const SPAWN_PLACEMENT_TYPE = SpawnPlacementTypes::PLACEMENT_TYPE_ON_GROUND;
 
 	/**
 	 * Called on server startup to register default entity types.
@@ -476,8 +484,16 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		}
 
 		self::$saveNames[$className] = $saveNames;
+		self::$spawnPlacementTypes[$className] = $className::SPAWN_PLACEMENT_TYPE;
+	}
 
-
+	/**
+	 * Returns an array of all registered entity classpaths.
+	 *
+	 * @return string[]
+	 */
+	public static function getKnownEntityTypes() : array{
+		return array_unique(self::$knownEntities);
 	}
 
 	/**
@@ -640,14 +656,14 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	protected $uuid;
 
 	public function __construct(Level $level, CompoundTag $nbt){
-		$this->random = new Random();
+		$this->random = new Random($level->random->nextInt());
 		$this->constructed = true;
 		$this->timings = Timings::getEntityTimings($this);
 
 		$this->temporalVector = new Vector3();
 
 		if($this->eyeHeight === null){
-			$this->eyeHeight = $this->height / 2 + 0.1;
+			$this->eyeHeight = $this->height * 0.85;
 		}
 
 		$this->id = Entity::$entityCount++;
@@ -664,7 +680,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		$this->boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
 		$this->recalculateBoundingBox();
 
-		$this->chunk = $this->level->getChunk($this->getFloorX() >> 4, $this->getFloorZ() >> 4, false);
+		$this->chunk = $this->level->getChunkAtPosition($this, false);
 		if($this->chunk === null){
 			throw new \InvalidStateException("Cannot create entities in unloaded chunks");
 		}
@@ -711,7 +727,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		$this->level->addEntity($this);
 
 		$this->lastUpdate = $this->server->getTick();
-		$this->server->getPluginManager()->callEvent(new EntitySpawnEvent($this));
+		(new EntitySpawnEvent($this))->call();
 
 		$this->scheduleUpdate();
 
@@ -1150,7 +1166,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	 * @param EntityDamageEvent $source
 	 */
 	public function attack(EntityDamageEvent $source) : void{
-		$this->server->getPluginManager()->callEvent($source);
+		$source->call();
 		if($source->isCancelled()){
 			return;
 		}
@@ -1164,7 +1180,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	 * @param EntityRegainHealthEvent $source
 	 */
 	public function heal(EntityRegainHealthEvent $source) : void{
-		$this->server->getPluginManager()->callEvent($source);
+		$source->call();
 		if($source->isCancelled()){
 			return;
 		}
@@ -1180,7 +1196,8 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	}
 
 	protected function onDeath() : void{
-		$this->server->getPluginManager()->callEvent($ev = new EntityDeathEvent($this, $this->getDrops()));
+		$ev = new EntityDeathEvent($this, $this->getDrops());
+		$ev->call();
 		foreach($ev->getDrops() as $drop){
 			$this->level->dropItem($this, $drop);
 		}
@@ -1411,7 +1428,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	}
 
 	protected function broadcastMovement(bool $teleport = false) : void{
-		if($this->chunk !== null){
+		if($this->isValid()){
 			$pk = new MoveEntityAbsolutePacket();
 			$pk->entityRuntimeId = $this->id;
 			$pk->position = $this->getOffsetPosition($this);
@@ -1430,17 +1447,17 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 				$pk->flags |= MoveEntityAbsolutePacket::FLAG_GROUND;
 			}
 
-			$this->level->addChunkPacket($this->chunk->getX(), $this->chunk->getZ(), $pk);
+			$this->level->broadcastPacketToViewers($this, $pk);
 		}
 	}
 
 	protected function broadcastMotion() : void{
-		if($this->chunk !== null){
+		if($this->isValid()){
 			$pk = new SetEntityMotionPacket();
 			$pk->entityRuntimeId = $this->id;
 			$pk->motion = $this->getMotion();
 
-			$this->level->addChunkPacket($this->chunk->getX(), $this->chunk->getZ(), $pk);
+			$this->level->broadcastPacketToViewers($this, $pk);
 		}
 	}
 
@@ -1951,47 +1968,6 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		return $block->isSolid() and !$block->isTransparent() and $block->collidesWithBB($this->getBoundingBox());
 	}
 
-	public function fastMove(float $dx, float $dy, float $dz) : bool{
-		$this->blocksAround = null;
-
-		if($dx == 0 and $dz == 0 and $dy == 0){
-			return true;
-		}
-
-		Timings::$entityMoveTimer->startTiming();
-
-		$newBB = $this->boundingBox->offsetCopy($dx, $dy, $dz);
-
-		$list = $this->level->getCollisionCubes($this, $newBB, false);
-
-		if(count($list) === 0){
-			$this->boundingBox = $newBB;
-		}
-
-		$this->x = ($this->boundingBox->minX + $this->boundingBox->maxX) / 2;
-		$this->y = $this->boundingBox->minY - $this->ySize;
-		$this->z = ($this->boundingBox->minZ + $this->boundingBox->maxZ) / 2;
-
-		$this->checkChunks();
-
-		if(!$this->onGround or $dy != 0){
-			$bb = clone $this->boundingBox;
-			$bb->minY -= 0.75;
-			$this->onGround = false;
-
-			if(count($this->level->getCollisionBlocks($bb)) > 0){
-				$this->onGround = true;
-			}
-		}
-		$this->isCollided = $this->onGround;
-		$this->updateFallState($dy, $this->onGround);
-
-
-		Timings::$entityMoveTimer->stopTiming();
-
-		return true;
-	}
-
 	public function move(float $dx, float $dy, float $dz) : void{
 		$this->blocksAround = null;
 
@@ -2277,7 +2253,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 			$this->chunk = $this->level->getChunk($chunkX, $chunkZ, true);
 
 			if(!$this->justCreated){
-				$newChunk = $this->level->getChunkPlayers($chunkX, $chunkZ);
+				$newChunk = $this->level->getViewersForPosition($this);
 				foreach($this->hasSpawned as $player){
 					if(!isset($newChunk[$player->getLoaderId()])){
 						$this->despawnFrom($player);
@@ -2309,7 +2285,8 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 
 	public function setMotion(Vector3 $motion) : bool{
 		if(!$this->justCreated){
-			$this->server->getPluginManager()->callEvent($ev = new EntityMotionEvent($this, $motion));
+			$ev = new EntityMotionEvent($this, $motion);
+			$ev->call();
 			if($ev->isCancelled()){
 				return false;
 			}
@@ -2346,7 +2323,8 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		}
 		$from = Position::fromObject($this, $this->level);
 		$to = Position::fromObject($pos, $pos instanceof Position ? $pos->getLevel() : $this->level);
-		$this->server->getPluginManager()->callEvent($ev = new EntityTeleportEvent($this, $from, $to));
+		$ev = new EntityTeleportEvent($this, $from, $to);
+		$ev->call();
 		if($ev->isCancelled()){
 			return false;
 		}
@@ -2374,7 +2352,8 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		}
 
 		if($this->isValid()){
-			$this->server->getPluginManager()->callEvent($ev = new EntityLevelChangeEvent($this, $this->level, $targetLevel));
+			$ev = new EntityLevelChangeEvent($this, $this->level, $targetLevel);
+			$ev->call();
 			if($ev->isCancelled()){
 				return false;
 			}
@@ -2437,7 +2416,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	 * @param Player $player
 	 */
 	public function spawnTo(Player $player) : void{
-		if(!isset($this->hasSpawned[$player->getLoaderId()]) and $this->chunk !== null and isset($player->usedChunks[Level::chunkHash($this->chunk->getX(), $this->chunk->getZ())])){
+		if(!isset($this->hasSpawned[$player->getLoaderId()])){
 			$this->hasSpawned[$player->getLoaderId()] = $player;
 
 			$this->sendSpawnPacket($player);
@@ -2448,7 +2427,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		if($this->chunk === null or $this->closed){
 			return;
 		}
-		foreach($this->level->getChunkPlayers($this->chunk->getX(), $this->chunk->getZ()) as $player){
+		foreach($this->level->getViewersForPosition($this) as $player){
 			if($player->isOnline()){
 				$this->spawnTo($player);
 			}
@@ -2510,7 +2489,7 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	 */
 	public function close() : void{
 		if(!$this->closed){
-			$this->server->getPluginManager()->callEvent(new EntityDespawnEvent($this));
+			(new EntityDespawnEvent($this))->call();
 			$this->closed = true;
 
 			$this->despawnFromAll();
@@ -2588,34 +2567,11 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		$pk->entityRuntimeId = $this->getId();
 		$pk->metadata = $data ?? $this->propertyManager->getAll();
 
-		// Temporary fix for player custom name tags visible
-		$includeNametag = isset($data[self::DATA_NAMETAG]);
-		if(($isPlayer = $this instanceof Player) and $includeNametag){
-			$remove = new RemoveEntityPacket();
-			$remove->entityUniqueId = $this->getId();
-			$add = new AddPlayerPacket();
-			$add->uuid = $this->getUniqueId();
-			$add->username = $this->getNameTag();
-			$add->entityRuntimeId = $this->getId();
-			$add->position = $this->asVector3();
-			$add->motion = $this->getMotion();
-			$add->yaw = $this->yaw;
-			$add->pitch = $this->pitch;
-			$add->item = $this->getInventory()->getItemInHand();
-			$add->metadata = $this->propertyManager->getAll();
-		}
-
 		foreach($player as $p){
 			if($p === $this){
 				continue;
 			}
 			$p->sendDataPacket(clone $pk);
-
-			// will remove soon
-			if($isPlayer and $includeNametag){
-				$p->sendDataPacket(clone $remove);
-				$p->sendDataPacket(clone $add);
-			}
 		}
 
 		if($this instanceof Player){

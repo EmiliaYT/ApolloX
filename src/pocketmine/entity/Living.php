@@ -26,10 +26,10 @@ namespace pocketmine\entity;
 use pocketmine\block\Block;
 use pocketmine\entity\object\LeashKnot;
 use pocketmine\entity\projectile\Projectile;
-use pocketmine\entity\projectile\ProjectileSource;
 use pocketmine\event\entity\EntityDamageByChildEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\event\entity\EntityEffectAddEvent;
 use pocketmine\event\entity\EntityEffectRemoveEvent;
 use pocketmine\inventory\ArmorInventory;
@@ -167,7 +167,7 @@ abstract class Living extends Entity implements Damageable{
 
 		$this->leashed = boolval($nbt->getByte("Leashed", 0));
 
-		if($this->isLeashed() and $nbt->hasTag("Leash",  CompoundTag::class)){
+		if($this->isLeashed() and $nbt->hasTag("Leash", CompoundTag::class)){
 			$this->leashNbt = $nbt->getCompoundTag("Leash");
 		}
 
@@ -302,7 +302,8 @@ abstract class Living extends Entity implements Damageable{
 		if(isset($this->effects[$effectId])){
 			$effect = $this->effects[$effectId];
 			$hasExpired = $effect->hasExpired();
-			$this->server->getPluginManager()->callEvent($ev = new EntityEffectRemoveEvent($this, $effect));
+			$ev = new EntityEffectRemoveEvent($this, $effect);
+			$ev->call();
 			if($ev->isCancelled()){
 				if($hasExpired and !$ev->getEffect()->hasExpired()){ //altered duration of an expired effect to make it not get removed
 					$this->sendEffectAdd($ev->getEffect(), true);
@@ -372,7 +373,7 @@ abstract class Living extends Entity implements Damageable{
 		$ev = new EntityEffectAddEvent($this, $effect, $oldEffect);
 		$ev->setCancelled($cancelled);
 
-		$this->server->getPluginManager()->callEvent($ev);
+		$ev->call();
 		if($ev->isCancelled()){
 			return false;
 		}
@@ -686,32 +687,40 @@ abstract class Living extends Entity implements Damageable{
 		$this->broadcastEntityEvent(EntityEventPacket::HURT_ANIMATION);
 	}
 
-    public function knockBack(float $x, float $z, float $base = 0.4): void{
-        $f = sqrt($x * $x + $z * $z);
-        if($f <= 0){
-            return;
-        }
-        if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
-            $f = 1 / $f;
-            $motion = clone $this->motion;
-            $motion->x /= 2;
-            $motion->z /= 2;
-            $motion->x += $x * $f * $base;
-            $motion->z += $z * $f * $base;
-            if($this->onGround){
-                $motion->y /= 2;
-                $motion->y += $base;
-                if($motion->y > 0.4){
-                    $motion->y = 0.4;
-                }
-            }
-            $this->setMotion($motion);
-        }
-    }
+	public function knockBack(float $x, float $z, float $base = 0.4) : void{
+		$f = sqrt($x * $x + $z * $z);
+		if($f <= 0){
+			return;
+		}
+		if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
+			$f = 1 / $f;
+			$motion = clone $this->motion;
+			$motion->x /= 2;
+			$motion->z /= 2;
+			$motion->x += $x * $f * $base;
+			$motion->z += $z * $f * $base;
+			if($this->onGround){
+				$motion->y /= 2;
+				$motion->y += $base;
+				if($motion->y > 0.4){
+					$motion->y = 0.4;
+				}
+			}
+			$this->setMotion($motion);
+		}
+	}
 
 	public function kill() : void{
 		parent::kill();
 		$this->startDeathAnimation();
+	}
+
+	protected function onDeath() : void{
+		$ev = new EntityDeathEvent($this, $this->getDrops());
+		$ev->call();
+		foreach($ev->getDrops() as $item){
+			$this->getLevel()->dropItem($this, $item);
+		}
 	}
 
 	protected function onDeathUpdate(int $tickDiff) : bool{
@@ -1109,5 +1118,19 @@ abstract class Living extends Entity implements Damageable{
 			}
 		}
 		return parent::onInteract($player, $item, $clickPos, $slot);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function canSpawnHere() : bool{
+		return true;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMaxSpawnedInChunk() : int{
+		return 4;
 	}
 }
