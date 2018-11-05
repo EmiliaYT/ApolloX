@@ -7,10 +7,10 @@ player:
 dimensions:
   # Choisissez si le nether est activé. Le nether sera automatiquement généré
   nether:
-    active: true
+    active: false
     level-name: "nether"
   end:
-    active: true
+    active: false
     level-name: "end"
 
 developer:
