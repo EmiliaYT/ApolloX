@@ -5,7 +5,7 @@ use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\generator\Generator;
-use pocketmine\level\generator\biome\Biome;
+use pocketmine\level\biome\Biome;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\level\generator\object\OreType;
@@ -72,9 +72,12 @@ class PorkWorld extends Generator
 
     private $genTrees;
 
-    public function __construct(array $settings = [])
-    {}
-
+	public function __construct(ChunkManager $level, int $seed, array $options = []){
+		parent::__construct($level, $seed, $options);
+		if(self::$GAUSSIAN_KERNEL === null){
+			self::generateKernel();
+		}
+		
    	public function init(ChunkManager $level, Random $random) : void{
 	//	parent::init($level, $random);
         $this->random = $random;
