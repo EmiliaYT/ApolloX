@@ -4,7 +4,7 @@ namespace net\daporkchop\world\biome;
 
 use pocketmine\level\generator\populator\TallGrass;
 use pocketmine\level\generator\populator\Tree;
-use pocketmine\level\biome\GrassyBiome;
+use pocketmine\level\generator\normal\biome\GrassyBiome;
 use pocketmine\block\Sapling;
 
 class JungleBiome extends GrassyBiome  {
