@@ -30,7 +30,20 @@ class SimpleChunkManager implements ChunkManager{
 	/** @var Chunk[] */
 	protected $chunks = [];
 
-	protected $worldHeight; //getseed
+	protected $seed;
+	protected $worldHeight;
+	
+	/**
+	 * SimpleChunkManager constructor.
+	 *
+	 * @param int $seed
+	 * @param int $worldHeight
+	 */
+	public function __construct(int $seed, int $worldHeight = Level::Y_MAX){
+		$this->seed = $seed;
+		$this->worldHeight = $worldHeight;
+	}
+
 
 	/**
 	 * SimpleChunkManager constructor.
