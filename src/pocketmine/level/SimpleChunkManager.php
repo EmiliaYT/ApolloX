@@ -44,16 +44,6 @@ class SimpleChunkManager implements ChunkManager{
 		$this->worldHeight = $worldHeight;
 	}
 
-
-	/**
-	 * SimpleChunkManager constructor.
-	 *
-	 * @param int $worldHeight
-	 */
-	public function __construct(int $worldHeight = Level::Y_MAX){
-		$this->worldHeight = $worldHeight;
-	}
-
 	/**
 	 * Gets the raw block id.
 	 *
