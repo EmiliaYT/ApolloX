@@ -28,7 +28,7 @@ declare(strict_types=1);
 namespace pocketmine\level\generator;
 
 use pocketmine\entity\CreatureType;
-use pocketmine\level\generator\biome\Biome;
+use pocketmine\level\biome\Biome;
 use pocketmine\level\ChunkManager;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
