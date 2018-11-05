@@ -27,6 +27,7 @@ namespace pocketmine\level\generator;
 use pocketmine\level\generator\end\End;
 use pocketmine\level\generator\hell\Nether;
 use pocketmine\level\generator\normal\Normal;
+use net\daporkchop\world\generator\PorkWorld;
 
 final class GeneratorManager{
 	/** @var string[] name => classname mapping */
