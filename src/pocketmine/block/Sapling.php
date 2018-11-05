@@ -33,6 +33,13 @@ use pocketmine\utils\Random;
 
 class Sapling extends Flowable{
 
+	public const OAK = 0;
+	public const SPRUCE = 1;
+	public const BIRCH = 2;
+	public const JUNGLE = 3;
+	public const ACACIA = 4;
+	public const DARK_OAK = 5;
+	
 	/** @var bool */
 	protected $ready = false;
 
@@ -69,6 +76,19 @@ class Sapling extends Flowable{
 
 		return false;
 	}
+	
+	public function getName() : string{
+		static $names = [
+			0 => "Oak Sapling",
+			1 => "Spruce Sapling",
+			2 => "Birch Sapling",
+			3 => "Jungle Sapling",
+			4 => "Acacia Sapling",
+			5 => "Dark Oak Sapling"
+		];
+		return $names[$this->getVariant()] ?? "Unknown";
+	}
+
 
 	public function onNearbyBlockChange() : void{
 		if($this->getSide(Facing::DOWN)->isTransparent()){
