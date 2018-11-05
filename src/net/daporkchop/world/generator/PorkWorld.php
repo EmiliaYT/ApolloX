@@ -5,7 +5,7 @@ use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\generator\Generator;
-use pocketmine\level\generator\biome\Biome;
+use pocketmine\level\biome\Biome;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\level\generator\object\OreType;

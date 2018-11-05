@@ -2,7 +2,7 @@
 
 namespace net\daporkchop\world\biome\abs;
 
-use pocketmine\level\generator\normal\biome\NormalBiome;
+use pocketmine\level\biome\NormalBiome;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\Block;
 

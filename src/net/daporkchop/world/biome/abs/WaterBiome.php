@@ -4,7 +4,7 @@ namespace net\daporkchop\world\biome\abs;
 
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
-use pocketmine\level\generator\normal\biome\NormalBiome;
+use pocketmine\level\biome\NormalBiome;
 
 abstract class WaterBiome extends NormalBiome    {
     public function __construct()   {
