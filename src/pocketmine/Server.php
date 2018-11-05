@@ -1602,7 +1602,7 @@ class Server{
 				"generator-settings" => "",
 				"level-name" => "world",
 				"level-seed" => "",
-				"level-type" => "DEFAULT",
+				"level-type" => "porkworld",
 				"enable-query" => true,
 				"enable-rcon" => false,
 				"rcon.password" => substr(base64_encode(random_bytes(20)), 3, 10),
