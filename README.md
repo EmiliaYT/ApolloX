@@ -2,8 +2,6 @@
 
 Apollo is a Minecraft: PE Server Software with an improved Generator and a lot more features.
 
-[ApolloBE Video](https://streamable.com/s/mlq5g/unfwgo)
-
 **CircleCI Build Status** [![CircleCI](https://circleci.com/gh/ApolloBE/Apollo-Legacy.svg?style=svg)](https://circleci.com/gh/ApolloBE/Apollo-Legacy)
 
 ## Download link(s)
@@ -19,6 +17,8 @@ Apollo is a Minecraft: PE Server Software with an improved Generator and a lot m
 - We are a edited version of PmmP. We have edited their generators to our version and have improved the performance
 - You can download .phar from Circle CI. Tab to latest build,tap to artifacts selection, tap to DevTools and download Apollo1.0dev.phar
 
+- watch are small trailer its really funny :P [ApolloBE Video](https://streamable.com/s/mlq5g/unfwgo)
+
 ## Cradits 
 
 - DaPorkchop (DaMatrix)
@@ -31,7 +31,7 @@ Apollo is a Minecraft: PE Server Software with an improved Generator and a lot m
  
 ## TODO :
 
-- [ ] import old stuff and update it
+- [X] import old stuff and update it
 
 - [X] new banners
 
@@ -42,6 +42,16 @@ Apollo is a Minecraft: PE Server Software with an improved Generator and a lot m
 - [X] add all blocks and functions
 
 - [X] add a improved generrator (just like 1.7.3)
+
+- [ ] add things that orginal bedrock server software got
+
+- [ ] add new items
+
+- [ ] add net blocks
+
+- [ ] add redstone 
+
+- [ ] optimise it (chunks mobs etc)
 
  If you have epic ideas, create an issue and tell us the idea!
 
