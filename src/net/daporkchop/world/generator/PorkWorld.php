@@ -72,11 +72,10 @@ class PorkWorld extends Generator
 
     private $genTrees;
 
-	public function __construct(ChunkManager $level, int $seed, array $options = []){
-		parent::__construct($level, $seed, $options);
-		if(self::$GAUSSIAN_KERNEL === null){
-			self::generateKernel();
-		}
+	//public function __construct(ChunkManager $level, int $seed, array $options = []){
+		
+    public function __construct(array $options = [])
+    {}
 		
    	public function init(ChunkManager $level, Random $random) : void{
 	//	parent::init($level, $random);
