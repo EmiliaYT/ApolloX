@@ -1545,15 +1545,15 @@ class Server{
 				$lang = $this->getLanguage()->getLang()
 			]));
 
-			if(file_exists(\pocketmine\RESOURCE_PATH . "altay_$lang.yml")){
-				$content = file_get_contents(\pocketmine\RESOURCE_PATH . "altay_$lang.yml");
+			if(file_exists(\pocketmine\RESOURCE_PATH . "apollo_$lang.yml")){
+				$content = file_get_contents(\pocketmine\RESOURCE_PATH . "apollo_$lang.yml");
 			}else{
-				$content = file_get_contents(\pocketmine\RESOURCE_PATH . "altay_eng.yml");
+				$content = file_get_contents(\pocketmine\RESOURCE_PATH . "apollo_eng.yml");
 			}
-			if(!file_exists($this->dataPath . "altay.yml")){
-				@file_put_contents($this->dataPath . "altay.yml", $content);
+			if(!file_exists($this->dataPath . "apollo.yml")){
+				@file_put_contents($this->dataPath . "apollo.yml", $content);
 			}
-			$this->altayConfig = new Config($this->dataPath . "altay.yml", Config::YAML, []);
+			$this->altayConfig = new Config($this->dataPath . "apollo.yml", Config::YAML, []);
 			$this->loadAltayConfig();
 
 			if(\pocketmine\IS_DEVELOPMENT_BUILD){
