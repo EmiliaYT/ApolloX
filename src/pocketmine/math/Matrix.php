@@ -103,7 +103,7 @@ class Matrix implements \ArrayAccess{
 		return $result;
 	}
 
-	public function subtract(Matrix $matrix){
+	public function substract(Matrix $matrix){
 		if($this->rows !== $matrix->getRows() or $this->columns !== $matrix->getColumns()){
 			return false;
 		}

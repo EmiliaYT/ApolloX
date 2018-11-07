@@ -24,39 +24,31 @@ declare(strict_types=1);
 namespace pocketmine\math;
 
 class Vector2{
-	/** @var float */
 	public $x;
-	/** @var float */
 	public $y;
 
-	public function __construct(float $x = 0, float $y = 0){
+	public function __construct($x = 0, $y = 0){
 		$this->x = $x;
 		$this->y = $y;
 	}
 
-	public function getX() : float{
+	public function getX(){
 		return $this->x;
 	}
 
-	public function getY() : float{
+	public function getY(){
 		return $this->y;
 	}
 
-	public function getFloorX() : int{
-		return (int) floor($this->x);
+	public function getFloorX(){
+		return (int) $this->x;
 	}
 
-	public function getFloorY() : int{
-		return (int) floor($this->y);
+	public function getFloorY(){
+		return (int) $this->y;
 	}
 
-	/**
-	 * @param Vector2|float $x
-	 * @param float         $y
-	 *
-	 * @return Vector2
-	 */
-	public function add($x, float $y = 0) : Vector2{
+	public function add($x, $y = 0){
 		if($x instanceof Vector2){
 			return $this->add($x->x, $x->y);
 		}else{
@@ -64,13 +56,7 @@ class Vector2{
 		}
 	}
 
-	/**
-	 * @param Vector2|float $x
-	 * @param float         $y
-	 *
-	 * @return Vector2
-	 */
-	public function subtract($x, float $y = 0) : Vector2{
+	public function subtract($x, $y = 0){
 		if($x instanceof Vector2){
 			return $this->add(-$x->x, -$x->y);
 		}else{
@@ -78,37 +64,31 @@ class Vector2{
 		}
 	}
 
-	public function ceil() : Vector2{
+	public function ceil(){
 		return new Vector2((int) ceil($this->x), (int) ceil($this->y));
 	}
 
-	public function floor() : Vector2{
+	public function floor(){
 		return new Vector2((int) floor($this->x), (int) floor($this->y));
 	}
 
-	public function round() : Vector2{
+	public function round(){
 		return new Vector2(round($this->x), round($this->y));
 	}
 
-	public function abs() : Vector2{
+	public function abs(){
 		return new Vector2(abs($this->x), abs($this->y));
 	}
 
-	public function multiply(float $number) : Vector2{
+	public function multiply($number){
 		return new Vector2($this->x * $number, $this->y * $number);
 	}
 
-	public function divide(float $number) : Vector2{
+	public function divide($number){
 		return new Vector2($this->x / $number, $this->y / $number);
 	}
 
-	/**
-	 * @param Vector2|float $x
-	 * @param float         $y
-	 *
-	 * @return float
-	 */
-	public function distance($x, float $y = 0) : float{
+	public function distance($x, $y = 0){
 		if($x instanceof Vector2){
 			return sqrt($this->distanceSquared($x->x, $x->y));
 		}else{
@@ -116,13 +96,7 @@ class Vector2{
 		}
 	}
 
-	/**
-	 * @param Vector2|float $x
-	 * @param float         $y
-	 *
-	 * @return float
-	 */
-	public function distanceSquared($x, float $y = 0) : float{
+	public function distanceSquared($x, $y = 0){
 		if($x instanceof Vector2){
 			return $this->distanceSquared($x->x, $x->y);
 		}else{
@@ -130,24 +104,24 @@ class Vector2{
 		}
 	}
 
-	public function length() : float{
+	public function length(){
 		return sqrt($this->lengthSquared());
 	}
 
-	public function lengthSquared() : float{
+	public function lengthSquared(){
 		return $this->x * $this->x + $this->y * $this->y;
 	}
 
-	public function normalize() : Vector2{
+	public function normalize(){
 		$len = $this->lengthSquared();
-		if($len > 0){
+		if($len != 0){
 			return $this->divide(sqrt($len));
 		}
 
 		return new Vector2(0, 0);
 	}
 
-	public function dot(Vector2 $v) : float{
+	public function dot(Vector2 $v){
 		return $this->x * $v->x + $this->y * $v->y;
 	}
 
