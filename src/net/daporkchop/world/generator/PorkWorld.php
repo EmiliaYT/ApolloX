@@ -5,7 +5,7 @@ use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\generator\Generator;
-use pocketmine\level\biome\Biome;
+use pocketmine\level\generator\biome\Biome;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\level\generator\object\OreType;
@@ -72,11 +72,9 @@ class PorkWorld extends Generator
 
     private $genTrees;
 
-	//public function __construct(ChunkManager $level, int $seed, array $options = []){
-		
-  //  public function __construct(array $options = [])
- //   {}
-		
+    public function __construct(array $settings = [])
+    {}
+
    	public function init(ChunkManager $level, Random $random) : void{
 	//	parent::init($level, $random);
         $this->random = $random;
@@ -181,7 +179,7 @@ class PorkWorld extends Generator
                     $d5 = ($this->noise[(($xPiece + 0) * $l + ($zPiece + 0)) * $b2 + ($yPiece + 1)] - $d1) * $d;
                     $d6 = ($this->noise[(($xPiece + 0) * $l + ($zPiece + 1)) * $b2 + ($yPiece + 1)] - $d2) * $d;
                     $d7 = ($this->noise[(($xPiece + 1) * $l + ($zPiece + 0)) * $b2 + ($yPiece + 1)] - $d3) * $d;
-                    $d8 = ($this->noise[(($xPiece + 1) * $l + ($zPiece + 1)) * $b2 + ($yPiece + 1)] - $d4) * $d; //generateNoiseArray2
+                    $d8 = ($this->noise[(($xPiece + 1) * $l + ($zPiece + 1)) * $b2 + ($yPiece + 1)] - $d4) * $d;
                     for ($l1 = 0; $l1 < 8; $l1 ++) {
                         $d9 = 0.25;
                         $d10 = $d1;
@@ -246,8 +244,8 @@ class PorkWorld extends Generator
         $d0 = 684.412;
         $d1 = 684.412;
         
-     //   $this->noise6 = $this->gen6->generateNoiseArray2($posX, $posZ, $xSize, $zSize, 1.121, 1.121, 0.5);
-     //   $this->noise7 = $this->gen7->generateNoiseArray2($posX, $posZ, $xSize, $zSize, 200, 200, 0.5);
+        $this->noise6 = $this->gen6->generateNoiseArray2($posX, $posZ, $xSize, $zSize, 1.121, 1.121, 0.5);
+        $this->noise7 = $this->gen7->generateNoiseArray2($posX, $posZ, $xSize, $zSize, 200, 200, 0.5);
         $this->noise3 = $this->gen3->generateNoiseArray($posX, $posY, $posZ, $xSize, $ySize, $zSize, $d0 / 80, $d1 / 160, $d0 / 80);
         $this->noise1 = $this->gen1->generateNoiseArray($posX, $posY, $posZ, $xSize, $ySize, $zSize, $d0, $d1, $d0);
         $this->noise2 = $this->gen2->generateNoiseArray($posX, $posY, $posZ, $xSize, $ySize, $zSize, $d0, $d1, $d0);

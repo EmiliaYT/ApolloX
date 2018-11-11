@@ -2,7 +2,7 @@
 
 namespace net\daporkchop\world;
 
-use pocketmine\level\biome\Biome;
+use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\generator\biome\BiomeSelector;
 use pocketmine\utils\Random;
 
