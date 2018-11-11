@@ -34,7 +34,26 @@ use pocketmine\utils\Random;
 use net\daporkchop\world\generator\PorkWorld;
 
 abstract class Generator{
-	private static $list = [];
+	
+private static $list = [];
+
+		/**
+	 * Converts a string level seed into an integer for use by the generator.
+	 *
+	 * @param string $seed
+	 *
+	 * @return int|null
+	 */
+	public static function convertSeed(string $seed) : ?int{
+		if($seed === ""){ //empty seed should cause a random seed to be selected - can't use 0 here because 0 is a valid seed
+			$convertedSeed = null;
+		}elseif(ctype_digit($seed)){ //this avoids treating seeds like "404.4" as integer seeds
+			$convertedSeed = (int) $seed;
+		}else{
+			$convertedSeed = Utils::javaStringHash($seed);
+		}
+		return $convertedSeed;
+	}
 
 	public static function addGenerator($object, $name) : bool{
 		if(is_subclass_of($object, Generator::class) and !isset(Generator::$list[$name = strtolower($name)])){
