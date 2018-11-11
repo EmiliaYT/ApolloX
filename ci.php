@@ -25,10 +25,10 @@ fclose($pipes[0]);
 fclose($pipes[1]);
 fclose($pipes[2]);
 echo "\nReturn value: ". proc_close($server) ."\n";
-if(count(glob("plugin_data/Altay/*.phar")) === 0){
+if(count(glob("plugins/Altay/Apollo_v4.0.0.phar")) === 0){
+echo "Server phar created!\n";
+   exit(0);
+  }else{
 echo "No server phar created!\n";
    exit(1);
-  }else{
-	echo "Server phar created!\n";
-	exit(0);
 }
