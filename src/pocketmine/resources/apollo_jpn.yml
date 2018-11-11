@@ -7,11 +7,11 @@ player:
 dimensions:
   # 有効にするとネザーワールドが自動的に生成され、ポータルを用いて移動できます
   nether:
-    active: false
+    active: true
     level-name: "nether"
   # 有効にするとエンドワールドが自動的に生成され、ポータルを用いて移動できます
   end:
-    active: false
+    active: true
     level-name: "end"
 
 developer:
@@ -25,6 +25,6 @@ developer:
 level:
   # 有効にすると、mobsは動き回ることができます
   # 注：この機能は、多数のmobが生成されたときにサーバーの遅延を引き起こす可能性があります
-  enable-mob-ai: false
+  enable-mob-ai: true
   # Generic Auto Mob Spawning, enable if you want spawn mobs in your world
-  generic-auto-mob-spawning: false
+  generic-auto-mob-spawning: true
