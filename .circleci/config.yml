@@ -32,7 +32,7 @@ jobs:
           name: Make server phar
           command: bin/php7/bin/php ci.php
       - store_artifacts:
-          path: plugin_data/Altay
+          path: plugins/Altay
           destination: Server phar
       - store_artifacts:
           path: plugins
