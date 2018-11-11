@@ -1,6 +1,6 @@
 ![Apollo](https://i.imgur.com/q75irAo.png)
 
-Apollo is a Minecraft: PE Server Software with an improved Generator and a lot more features.
+ApolloX is Just a optimised feature full pmmp based fork you can see us like paperspigot.
 
 **CircleCI Build Status** [![CircleCI](https://circleci.com/gh/ApolloBE/ApolloX.svg?style=svg)](https://circleci.com/gh/ApolloBE/ApolloX)
 
