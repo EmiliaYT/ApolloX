@@ -7,10 +7,10 @@ player:
 dimensions:
   # Choose if the nether is allowed. The level of nether will generate automatically
   nether:
-    active: false
+    active: true
     level-name: "nether"
   end:
-    active: false
+    active: true
     level-name: "end"
 
 developer:
@@ -24,6 +24,6 @@ developer:
 level:
   # If enabled, mobs can move around
   # Note: this feature can be cause lag in your server when lots of mob are spawned
-  enable-mob-ai: false
+  enable-mob-ai: true
   # Generic Auto Mob Spawning, enable if you want spawn mobs in your world
-  generic-auto-mob-spawning: false
+  generic-auto-mob-spawning: true
