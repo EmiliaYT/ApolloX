@@ -137,7 +137,7 @@ class PopulationTask extends AsyncTask{
 		}
 	}
 
-	public function onCompletion(Server $server) : void{
+	public function onCompletion() : void{
 		/** @var Level $level */
 		$level = $this->fetchLocal();
 		if(!$level->isClosed()){
