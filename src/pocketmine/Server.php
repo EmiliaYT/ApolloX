@@ -1796,7 +1796,6 @@ class Server{
 					}else{
 						$generator = GeneratorManager::getGenerator("default");
 					}
-
 					$this->generateLevel($name, Generator::convertSeed((string) ($options["seed"] ?? "")), $generator, $options);
 				}
 			}
