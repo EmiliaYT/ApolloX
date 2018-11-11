@@ -53,7 +53,7 @@ fclose($pipes[0]);
 fclose($pipes[1]);
 fclose($pipes[2]);
 echo "\nReturn value: ". proc_close($server) ."\n";
-if(count(glob("plugin_data/Apollo/*.phar")) === 0){
+if(count(glob("Altay/Apollo/*.phar")) === 0){
 <?php
 $time = time();
 $port = rand(1000,60000);
