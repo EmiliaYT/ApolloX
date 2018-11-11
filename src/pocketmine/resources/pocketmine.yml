@@ -22,10 +22,10 @@ settings:
  #Used for plugin asynchronous tasks, world generation, compression and web communication.
  #Set this approximately to your number of cores.
  #If set to auto, it'll try to detect the number of cores (or use 2)
- async-workers: auto
+ async-workers: 4
  #Whether to allow running development builds. Dev builds might crash, break your plugins, corrupt your world and more.
  #It is recommended to avoid using development builds where possible.
- enable-dev-builds: false
+ enable-dev-builds: true
 
 memory:
  #Global soft memory limit in megabytes. Set to 0 to disable
@@ -38,7 +38,7 @@ memory:
 
  #Main thread hard memory limit in megabytes. Set to 0 to disable
  #This will stop the server when the limit is surpassed
- main-hard-limit: 1024
+ main-hard-limit: 2024
 
  #AsyncWorker threads' hard memory limit in megabytes. Set to 0 to disable
  #This will crash the task currently executing on the worker if the task exceeds the limit
@@ -91,7 +91,7 @@ network:
  #Compression level used when sending batched packets. Higher = more CPU, less bandwidth usage
  compression-level: 7
  #Use AsyncTasks for compression. Adds half/one tick delay, less CPU load on main thread
- async-compression: false
+ async-compression: true
  #Experimental, only for Windows. Tries to use UPnP to automatically port forward
  upnp-forwarding: false
  #Maximum size in bytes of packets sent over the network (default 1492 bytes). Packets larger than this will be
@@ -141,7 +141,7 @@ chunk-ticking:
  per-tick: 40
  #Radius of chunks around a player to tick
  tick-radius: 3
- light-updates: false
+ light-updates: true
  clear-tick-list: true
  #IDs of blocks not to perform random ticking on.
  disable-block-ticking:
