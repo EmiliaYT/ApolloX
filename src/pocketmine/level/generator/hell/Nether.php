@@ -26,7 +26,6 @@ namespace pocketmine\level\generator\hell;
 use pocketmine\block\Block;
 use pocketmine\block\Gravel;
 use pocketmine\block\Lava;
-use pocketmine\block\NetherQuartzOre;
 use pocketmine\block\Quartz;
 use pocketmine\block\SoulSand;
 use pocketmine\level\biome\Biome;
@@ -37,6 +36,7 @@ use pocketmine\level\generator\object\OreType;
 use pocketmine\level\generator\populator\Ore;
 use pocketmine\level\generator\populator\Populator;
 use pocketmine\math\Vector3;
+use pocketmine\utils\Random;
 
 class Nether extends Generator{
 
@@ -56,15 +56,27 @@ class Nether extends Generator{
 	/** @var Simplex */
 	private $noiseBase;
 
-	public function __construct(ChunkManager $level, int $seed, array $options = []){
-		parent::__construct($level, $seed, $options);
+	public function __construct(array $options = []){
 
+	}
+
+	public function getName() : string{
+		return "nether";
+	}
+
+	public function getSettings() : array{
+		return [];
+	}
+
+	public function init(ChunkManager $level, Random $random) : void{
+		parent::init($level, $random);
+		$this->random->setSeed($this->level->getSeed());
 		$this->noiseBase = new Simplex($this->random, 4, 1 / 4, 1 / 64);
-		$this->random->setSeed($this->seed);
+		$this->random->setSeed($this->level->getSeed());
 
 		$ores = new Ore();
 		$ores->setOreTypes([
-			new OreType(new NetherQuartzOre(), 20, 16, 0, 128),
+			new OreType(new Quartz(), 20, 16, 0, 128),
 			new OreType(new SoulSand(), 5, 64, 0, 128),
 			new OreType(new Gravel(), 5, 64, 0, 128),
 			new OreType(new Lava(), 1, 16, 0, $this->waterHeight)
@@ -72,12 +84,8 @@ class Nether extends Generator{
 		$this->populators[] = $ores;
 	}
 
-	public function getName() : string{
-		return "nether";
-	}
-
 	public function generateChunk(int $chunkX, int $chunkZ) : void{
-		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->seed);
+		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
 
 		$noise = $this->noiseBase->getFastNoise3D(16, 128, 16, 4, 8, 4, $chunkX * 16, 0, $chunkZ * 16);
 
@@ -112,7 +120,7 @@ class Nether extends Generator{
 	}
 
 	public function populateChunk(int $chunkX, int $chunkZ) : void{
-		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->seed);
+		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
 		foreach($this->populators as $populator){
 			$populator->populate($this->level, $chunkX, $chunkZ, $this->random);
 		}
@@ -125,4 +133,5 @@ class Nether extends Generator{
 	public function getSpawn() : Vector3{
 		return new Vector3(127.5, 128, 127.5);
 	}
+
 }

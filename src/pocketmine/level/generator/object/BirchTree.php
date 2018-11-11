@@ -29,11 +29,13 @@ use pocketmine\level\ChunkManager;
 use pocketmine\utils\Random;
 
 class BirchTree extends Tree{
-	/** @var bool */
+
 	protected $superBirch = false;
 
 	public function __construct(bool $superBirch = false){
-		parent::__construct(Block::LOG, Block::LEAVES, Wood::BIRCH);
+		$this->trunkBlock = Block::LOG;
+		$this->leafBlock = Block::LEAVES;
+		$this->type = Wood::BIRCH;
 		$this->superBirch = $superBirch;
 	}
 
