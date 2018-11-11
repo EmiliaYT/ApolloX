@@ -82,9 +82,9 @@ fclose($pipes[1]);
 fclose($pipes[2]);
 echo "\nReturn value: ". proc_close($server) ."\n";
 if(count(glob("plugin_data/Apollo/*.phar")) === 0){
-echo "No server phar created!\n";
-   exit(1);
-  }else{
+	echo "No server phar created!\n";
+	exit(1);
+}else{
 	echo "Server phar created!\n";
 	exit(0);
 }
