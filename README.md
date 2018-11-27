@@ -1,3 +1,4 @@
+# this project is temporarily paused
 ![Apollo](https://i.imgur.com/q75irAo.png)
 
 ApolloX is Just a optimised feature full pmmp based fork you can see us like paperspigot.
